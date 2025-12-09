@@ -1,6 +1,6 @@
-# Transit Routing API
+# Transit Routing Service
 
-A FastAPI application for finding optimal public transit routes.
+A gRPC-based service for finding optimal public transit routes.
 
 ## Project Structure
 
@@ -16,7 +16,10 @@ A FastAPI application for finding optimal public transit routes.
 │   ├── routing.py         # Core routing logic and helper functions
 │   └── network.py         # Network creation and GTFS loading
 ├── app/
-│   └── main.py            # FastAPI application
+│   ├── routing.proto      # gRPC service definition
+│   ├── grpc_server.py     # gRPC server implementation
+│   ├── routing_pb2.py     # Generated protobuf code
+│   └── routing_pb2_grpc.py # Generated gRPC code
 ├── example_usage.py       # Example script
 ├── requirements.txt       # Python dependencies
 └── README.md             # This file
@@ -30,26 +33,31 @@ pip install -r requirements.txt
 
 ## Quick Start
 
-### 1. Create Network and Find Routes (Script)
+### 1. Generate gRPC Code (First Time Only)
+
+```bash
+cd app
+python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. routing.proto
+```
+
+### 2. Run the gRPC Server
+
+```bash
+cd app
+python grpc_server.py
+```
+
+The server will start on port `50051` and load all network data at startup.
+
+### 3. Test with Postman or any gRPC client
+
+Use Postman or any gRPC client to connect to `localhost:50051` with the proto file.
+
+### 4. Create Network and Find Routes (Script)
 
 ```bash
 python example_usage.py
 ```
-
-### 2. Run the API Server
-
-```bash
-cd app
-python main.py
-```
-
-Or using uvicorn directly:
-
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API will be available at `http://localhost:8000`
 
 ## Using the Modules Directly
 
@@ -91,25 +99,76 @@ journeys = find_journeys(
 )
 ```
 
-## API Endpoints
+## gRPC Service Methods
 
-### Health Check
+### HealthCheck
 
-- **GET** `/health`
-- Returns the status of the API
+Request: Empty
+Response:
 
-### Find Routes
+```protobuf
+{
+  status: "healthy"
+  message: "Transit Routing gRPC Service is running"
+}
+```
 
-- **POST** `/route`
-- Request body: JSON with graph, pathways, start/goal trips, and max transfers
-- Returns: List of possible journeys with costs (money, time, walking distance)
+### FindRoute
 
-## API Documentation
+Request:
 
-Once running, visit:
+```protobuf
+{
+  start_lon: 29.96139328537071
+  start_lat: 31.22968895248673
+  end_lon: 29.94194179397711
+  end_lat: 31.20775934404925
+  max_transfers: 2
+  walking_cutoff: 1000.0
+}
+```
 
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+Response:
+
+```protobuf
+{
+  num_journeys: int
+  journeys: [
+    {
+      path: ["trip_id1", "trip_id2", ...]
+      costs: {
+        money: float
+        transport_time: float
+        walk: float
+      }
+    }
+  ]
+  start_trips_found: int
+  end_trips_found: int
+}
+```
+
+## Using Postman
+
+1. **Import Proto File**: In Postman, create a new gRPC request and import `app/routing.proto`
+2. **Server URL**: `localhost:50051`
+3. **Select Method**:
+
+   - `routing.RoutingService/HealthCheck` for health check
+   - `routing.RoutingService/FindRoute` for finding routes
+
+4. **Example Request for FindRoute**:
+
+```json
+{
+  "start_lon": 29.96139328537071,
+  "start_lat": 31.22968895248673,
+  "end_lon": 29.94194179397711,
+  "end_lat": 31.20775934404925,
+  "max_transfers": 2,
+  "walking_cutoff": 1000.0
+}
+```
 
 ## Data Files
 

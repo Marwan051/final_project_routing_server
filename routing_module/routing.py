@@ -51,8 +51,16 @@ def load_model(model_path=None):
     if model_path is None:
         # Default to data/utils/trip_price_model.joblib relative to this file
         model_path = os.path.join(os.path.dirname(__file__), 'data', 'utils', 'trip_price_model.joblib')
-    model = load(model_path)
-    return TripPricePredictor(model)
+    
+    # Load the model - it might already be a TripPricePredictor or just the sklearn model
+    loaded_model = load(model_path)
+    
+    # If it's already a TripPricePredictor, return it directly
+    if isinstance(loaded_model, TripPricePredictor):
+        return loaded_model
+    
+    # Otherwise, wrap it in TripPricePredictor
+    return TripPricePredictor(loaded_model)
 
 
 def get_distance(trip_id, start_stop, end_stop, distances_path=None):
