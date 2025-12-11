@@ -70,6 +70,10 @@ def get_distance(trip_id, start_stop, end_stop, distances_path=None):
     dist = pd.read_csv(distances_path)
     return dist[dist["trip_id"] == trip_id]["distance_km"].values[0]
 
+#TODO: talk to database (start coord,end coord)
+def get_distance_coord(trip_id, start_lat, start_lon,end_lat,end_lon):
+    pass
+
 
 def get_cost(trip_id, start_stop, end_stop, distances_path=None, model_path=None):
     """Calculate the cost of a trip between two stops"""
