@@ -7,6 +7,10 @@ from collections import deque, defaultdict
 from joblib import load
 from sklearn.base import BaseEstimator, RegressorMixin
 
+from sklearn.pipeline import Pipeline
+
+from routing_module.database import PostgresConnector
+
 
 class TripPricePredictor(BaseEstimator, RegressorMixin):
     def __init__(self, model):
@@ -51,7 +55,6 @@ def load_model(model_path=None):
     if model_path is None:
         # Default to data/utils/trip_price_model.joblib relative to this file
         model_path = os.path.join(os.path.dirname(__file__), 'data', 'utils', 'trip_price_model.joblib')
-    
     # Load the model - it might already be a TripPricePredictor or just the sklearn model
     loaded_model = load(model_path)
     
@@ -71,8 +74,8 @@ def get_distance(trip_id, start_stop, end_stop, distances_path=None):
     return dist[dist["trip_id"] == trip_id]["distance_km"].values[0]
 
 #TODO: talk to database (start coord,end coord)
-def get_distance_coord(trip_id, start_lat, start_lon,end_lat,end_lon):
-    pass
+def get_distance_coord(trip_id, start_lat, start_lon,end_lat,end_lon,db:PostgresConnector):
+    dist = db.get_distance_between_two_coordinates_within_route(trip_id, start_lat, start_lon,end_lat,end_lon)
 
 
 def get_cost(trip_id, start_stop, end_stop, distances_path=None, model_path=None):
@@ -317,3 +320,99 @@ def find_journeys(graph, pathways_dict, start_trips, goal_trips, max_transfers, 
                     results.append((new_path, final_journey_costs))
 
     return results
+
+
+def _estimator_to_dict(estimator):
+    """Convert an sklearn estimator (or pipeline) to a serializable dict.
+
+    - Uses `get_params()` for general params.
+    - Adds `coef_`, `intercept_`, and `feature_importances_` if present.
+    - If the estimator is a Pipeline, extracts step info recursively.
+    """
+    if estimator is None:
+        return None
+
+    # If wrapped in TripPricePredictor, unwrap
+    if isinstance(estimator, TripPricePredictor):
+        estimator = estimator.model
+
+    result = {}
+
+    # Basic params
+    try:
+        params = estimator.get_params(deep=False)
+        # Convert any non-serializable values to strings
+        safe_params = {}
+        for k, v in params.items():
+            try:
+                json.dumps({k: v})
+                safe_params[k] = v
+            except Exception:
+                safe_params[k] = str(v)
+        result['params'] = safe_params
+    except Exception:
+        result['params'] = str(getattr(estimator, '__class__', type(estimator)).__name__)
+
+    # Coefficients / intercept
+    if hasattr(estimator, 'coef_'):
+        try:
+            coef = estimator.coef_
+            result['coef'] = coef.tolist() if hasattr(coef, 'tolist') else coef
+        except Exception:
+            result['coef'] = str(getattr(estimator, 'coef_', None))
+
+    if hasattr(estimator, 'intercept_'):
+        try:
+            intercept = estimator.intercept_
+            result['intercept'] = intercept.tolist() if hasattr(intercept, 'tolist') else intercept
+        except Exception:
+            result['intercept'] = str(getattr(estimator, 'intercept_', None))
+
+    # Feature importances (tree-based)
+    if hasattr(estimator, 'feature_importances_'):
+        try:
+            fi = estimator.feature_importances_
+            result['feature_importances'] = fi.tolist() if hasattr(fi, 'tolist') else fi
+        except Exception:
+            result['feature_importances'] = str(getattr(estimator, 'feature_importances_', None))
+
+    # Pipeline handling
+    if isinstance(estimator, Pipeline):
+        steps_info = []
+        for name, step in estimator.steps:
+            steps_info.append({
+                'name': name,
+                'class': step.__class__.__name__,
+                'estimator': _estimator_to_dict(step)
+            })
+        result['pipeline'] = steps_info
+
+    return result
+
+
+def extract_model_params(model_path=None, out_path=None):
+    """Load the saved model and return a JSON-serializable dictionary of its parameters.
+
+    If `out_path` is provided, the resulting dict will be written to that file.
+    """
+    if model_path is None:
+        model_path = os.path.join(os.path.dirname(__file__), 'data', 'utils', 'trip_price_model.joblib')
+
+    loaded = load(model_path)
+
+    # If the saved object is the wrapper, use it; otherwise wrap
+    if isinstance(loaded, TripPricePredictor):
+        estimator = loaded
+    else:
+        estimator = TripPricePredictor(loaded)
+
+    info = {
+        'class': estimator.__class__.__name__,
+        'wrapped_model': _estimator_to_dict(estimator)
+    }
+
+    if out_path:
+        with open(out_path, 'w') as f:
+            json.dump(info, f, indent=2)
+
+    return info

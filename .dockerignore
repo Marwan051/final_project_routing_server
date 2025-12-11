@@ -1,0 +1,50 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+
+# Data files (if large, commit separately or use git-lfs)
+# Uncomment if you don't want to commit data files:
+# routing_module/data/
+
+# Generated files
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# gRPC generated files (regenerate as needed)
+app/*_pb2.py
+app/*_pb2_grpc.py
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test coverage
+.coverage
+htmlcov/
