@@ -77,8 +77,10 @@ def get_distance_coord(trip_id, start_lat, start_lon,end_lat,end_lon):
 
 def get_cost(trip_id, start_stop, end_stop, distances_path=None, model_path=None):
     """Calculate the cost of a trip between two stops"""
+    return 5
     distance = get_distance(trip_id, start_stop, end_stop, distances_path)
     model = load_model(model_path)
+    
     return model.predict([distance])[0]
 
 
