@@ -114,17 +114,17 @@ class PostgresConnector:
                                     rg.geom_22992
                                 FROM trip t
                                 JOIN route_geometry rg ON t.route_geom_id = rg.route_geom_id
-                                WHERE t.gtfs_trip_id = %s  -- your GTFS trip ID
+                                WHERE t.gtfs_trip_id = %s  -- GTFS trip ID
                             ),
                             point_positions AS (
                                 SELECT 
                                     ST_LineLocatePoint(
                                         ti.geom_22992,
-                                        ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 22992)
+                                        ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 22992) -- start lon, start lat
                                     ) AS start_fraction,
                                     ST_LineLocatePoint(
                                         ti.geom_22992,
-                                        ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 22992)
+                                        ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 22992) -- end lon, end lat
                                     ) AS end_fraction
                                 FROM trip_info ti
                             )
@@ -139,7 +139,6 @@ class PostgresConnector:
                             FROM trip_info ti
                             CROSS JOIN point_positions pp;
                     """
-
         # Ensure connection exists
         if self._connection is None:
             # Try to reconnect once
@@ -205,37 +204,30 @@ class PostgresConnector:
                         WITH trip_info AS (
                             SELECT 
                                 t.trip_id,
-                                t.route_geom_id,
                                 rg.geom_22992
                             FROM trip t
                             JOIN route_geometry rg ON t.route_geom_id = rg.route_geom_id
-                            WHERE t.gtfs_trip_id = %s  -- your GTFS trip ID
+                            WHERE t.gtfs_trip_id = %s
                         ),
                         stop_positions AS (
                             SELECT 
-                                rs.stop_sequence,
-                                s.gtfs_stop_id,
-                                s.geom_22992,
                                 ST_LineLocatePoint(ti.geom_22992, s.geom_22992) AS location_fraction
                             FROM route_stop rs
                             JOIN "stop" s ON rs.stop_id = s.stop_id
                             JOIN trip_info ti ON rs.trip_id = ti.trip_id
-                            WHERE s.gtfs_stop_id IN (%s, %s)  -- start and end GTFS stop IDs
+                            WHERE s.gtfs_stop_id IN (%s, %s)
                         )
                         SELECT 
                             ST_Length(
                                 ST_LineSubstring(
                                     ti.geom_22992,
-                                    MIN(sp.location_fraction),
-                                    MAX(sp.location_fraction)
+                                    (SELECT MIN(location_fraction) FROM stop_positions),
+                                    (SELECT MAX(location_fraction) FROM stop_positions)
                                 )
                             ) AS distance_meters
-                        FROM trip_info ti
-                        CROSS JOIN stop_positions sp
-                        GROUP BY ti.geom_22992;
+                        FROM trip_info ti;
                 """
 
-        trip_id = str(trip_id)
         start_stop = str(start_stop)
         end_stop = str(end_stop)
 
