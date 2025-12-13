@@ -1,7 +1,7 @@
 services:
-  transport-db:
-    image: routing_db:1.0
-    container_name: transport-db
+  transport_db_test:
+    image: routing_db:2.0
+    container_name: transport_db
     environment:
       POSTGRES_DB: transport_db
       POSTGRES_USER: postgres
@@ -16,14 +16,21 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
   routing_server:
     build: .
     container_name: routing_server
     environment:
-      - PG_DB_NAME: transport_db
-      - PG_USER: postgres
-      - PG_PASSWORD: postgres
-      - PG_HOST: transport-db
-      - PG_PORT: 5432
+      PG_DB_NAME: transport_db
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_HOST: transport_db_test
+      PG_PORT: "5432"
+    ports:
+      - "50051:50051"
     depends_on:
-      - transport-db
+      - transport_db_test
+
+volumes:
+  postgres_data:
+    driver: local

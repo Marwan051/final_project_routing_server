@@ -1,11 +1,10 @@
 # Multi-stage build for optimized image size
-FROM python:3.11-alpine3.23 as builder
+FROM python:3.11-slim AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgeos-dev \
-    libspatialindex-dev \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -19,12 +18,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Final stage - minimal runtime image
-FROM python:3.11-alpine3.23
+FROM python:3.11-slim
 
 # Install runtime dependencies only
 RUN apt-get update && apt-get install -y \
     libgeos-c1v5 \
-    libspatialindex6 \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
 

@@ -1,0 +1,1 @@
+docker compose -f test_with_db.docker-compose.yml down -v && docker compose -f test_with_db.docker-compose.yml up -d --build

@@ -31,10 +31,6 @@ ENV/
 dist/
 build/
 
-# gRPC generated files (regenerate as needed)
-app/*_pb2.py
-app/*_pb2_grpc.py
-
 # Jupyter notebooks checkpoints
 .ipynb_checkpoints/
 

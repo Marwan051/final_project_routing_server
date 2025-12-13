@@ -1,9 +1,14 @@
 import os
 import psycopg2
 from psycopg2 import OperationalError
+import logging
 
 # Add this import for reading the .env file
 from dotenv import load_dotenv
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 import os
@@ -134,6 +139,7 @@ class PostgresConnector:
         try:
             cur = self._connection.cursor()
             params = (start_lon, start_lat, end_lon, end_lat, route_id)
+            logger.info(f"Executing query with params: {params}")
             cur.execute(template_query, params)
             row = cur.fetchone()
             # row[0] will be the length in the SRID units (meters for 22992)
@@ -141,8 +147,15 @@ class PostgresConnector:
                 return float(row[0])
             return None
         except Exception as e:
+            logger.error(
+                f"Database error in get_distance_between_two_coordinates_within_route: {e}"
+            )
+            logger.error(f"Query: {template_query}")
+            logger.error(f"Params: {params}")
+            logger.error(f"Full exception details:", exc_info=True)
             # If the error appears to be a connection issue, try reconnecting once
             try:
+                logger.info("Attempting to reconnect...")
                 self.connect()
                 cur = self._connection.cursor()
                 params = (start_lon, start_lat, end_lon, end_lat, route_id)
@@ -151,7 +164,127 @@ class PostgresConnector:
                 if row and row[0] is not None:
                     return float(row[0])
                 return None
-            except Exception:
+            except Exception as retry_e:
+                logger.error(f"Retry failed: {retry_e}", exc_info=True)
+                raise
+        finally:
+            if cur:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
+
+    def get_distance_between_two_stops_within_route(
+        self, trip_id, start_stop, end_stop
+    ):
+        """Return the distance (meters) between two stops along a route.
+
+        This queries the database for the actual stop coordinates, then uses the
+        coordinate-based distance calculation.
+
+        Args:
+            route_id: The route geometry ID
+            start_stop: The starting stop ID
+            end_stop: The ending stop ID
+
+        Returns:
+            float: Distance in meters, or None if stops/route not found
+        """
+        # First, get the coordinates of both stops
+        stops_query = """
+                        SELECT 
+                        t.gtfs_trip_id,
+                        start_rs.stop_sequence AS start_sequence,
+                        end_rs.stop_sequence AS end_sequence,
+                        start_stop.name AS start_stop_name,
+                        end_stop.name AS end_stop_name,
+                        ST_Distance(
+                            start_stop.geom_22992,
+                            end_stop.geom_22992
+                        ) AS straight_line_distance_meters,
+                        -- Distance along the route geometry (if available)
+                        CASE 
+                            WHEN rg.geom_22992 IS NOT NULL THEN
+                                ST_Length(
+                                    ST_LineSubstring(
+                                        rg.geom_22992,
+                                        LEAST(
+                                            ST_LineLocatePoint(rg.geom_22992, start_stop.geom_22992),
+                                            ST_LineLocatePoint(rg.geom_22992, end_stop.geom_22992)
+                                        ),
+                                        GREATEST(
+                                            ST_LineLocatePoint(rg.geom_22992, start_stop.geom_22992),
+                                            ST_LineLocatePoint(rg.geom_22992, end_stop.geom_22992)
+                                        )
+                                    )
+                                )
+                            ELSE NULL
+                        END AS route_distance_meters
+                    FROM trip t
+                    JOIN route_stop start_rs ON t.trip_id = start_rs.trip_id
+                    JOIN route_stop end_rs ON t.trip_id = end_rs.trip_id
+                    JOIN "stop" start_stop ON start_rs.stop_id = start_stop.stop_id
+                    JOIN "stop" end_stop ON end_rs.stop_id = end_stop.stop_id
+                    LEFT JOIN route_geometry rg ON t.route_geom_id = rg.route_geom_id
+                    WHERE t.gtfs_trip_id = %s  -- Replace with your GTFS trip ID
+                    AND start_rs.stop_sequence = %s  -- Start stop sequence
+                    AND end_rs.stop_sequence = %s;   -- End stop sequence
+                """
+
+        # Ensure connection exists
+        if self._connection is None:
+            # Try to reconnect once
+            try:
+                self.connect()
+            except Exception as e:
+                raise RuntimeError(f"Database connection not available: {e}") from e
+
+        cur = None
+        try:
+            cur = self._connection.cursor()
+            params = (trip_id, start_stop, end_stop)
+            logger.info(
+                f"Executing get_distance_between_two_stops_within_route with params: trip_id={trip_id}, start_stop={start_stop}, end_stop={end_stop}"
+            )
+            logger.debug(f"Full query params: {params}")
+            cur.execute(stops_query, params)
+            row = cur.fetchone()
+            logger.info(f"Fecthed data: {row}")
+            # row[0] will be the length in the SRID units (meters for 22992)
+            if row and row[0] is not None:
+                logger.info(f"Successfully calculated distance: {row[0]} meters")
+                return float(row[0])
+            else:
+                logger.warning(
+                    f"No distance found for gtfs_trip_id={trip_id}, start_stop_id={start_stop}, end_stop_id={end_stop}"
+                )
+                logger.warning(
+                    "Possible reasons: trip not found, stops not in trip, or missing geometry data"
+                )
+                return None
+        except Exception as e:
+            logger.error(
+                f"Database error in get_distance_between_two_stops_within_route: {e}"
+            )
+            logger.error(f"Query: {stops_query}")
+            logger.error(
+                f"Params: trip_id={trip_id}, start_stop={start_stop}, end_stop={end_stop}"
+            )
+            logger.error(f"Full params tuple: {params}")
+            logger.error(f"Full exception details:", exc_info=True)
+            # If the error appears to be a connection issue, try reconnecting once
+            try:
+                logger.info("Attempting to reconnect...")
+                self.connect()
+                cur = self._connection.cursor()
+                params = (trip_id, start_stop, end_stop)
+                cur.execute(stops_query, params)
+                row = cur.fetchone()
+                if row and row[0] is not None:
+                    return float(row[0])
+                return None
+            except Exception as retry_e:
+                logger.error(f"Retry failed: {retry_e}", exc_info=True)
                 raise
         finally:
             if cur:
