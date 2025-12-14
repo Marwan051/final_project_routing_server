@@ -61,9 +61,9 @@ class PostgresConnector:
 
         # Retry logic for container startup delays
         import time
+
         max_retries = 30
         retry_delay = 2  # seconds
-        
         for attempt in range(1, max_retries + 1):
             try:
                 self._connection = psycopg2.connect(
@@ -79,7 +79,9 @@ class PostgresConnector:
                 return  # Success, exit retry loop
             except OperationalError as e:
                 if attempt < max_retries:
-                    print(f"⏳ Connection attempt {attempt}/{max_retries} failed, retrying in {retry_delay}s...")
+                    print(
+                        f"⏳ Connection attempt {attempt}/{max_retries} failed, retrying in {retry_delay}s..."
+                    )
                     time.sleep(retry_delay)
                 else:
                     print(f"❌ All {max_retries} connection attempts failed: {e}")

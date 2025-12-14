@@ -23,6 +23,7 @@ import routing_pb2_grpc
 
 # Make TripPricePredictor available in __main__ for pickle to find it
 import __main__
+
 __main__.TripPricePredictor = TripPricePredictor
 
 # Global variables to store loaded data
