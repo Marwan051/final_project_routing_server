@@ -1,6 +1,6 @@
 services:
   transport_db_test:
-    image: routing_db:2.0
+    image: routing-db:2.0
     container_name: transport_db
     environment:
       POSTGRES_DB: transport_db
@@ -24,12 +24,14 @@ services:
       PG_DB_NAME: transport_db
       PG_USER: postgres
       PG_PASSWORD: postgres
-      PG_HOST: transport_db_test
+      PG_HOST: transport_db
       PG_PORT: "5432"
     ports:
       - "50051:50051"
     depends_on:
-      - transport_db_test
+      transport_db_test:
+        condition: service_healthy
+    restart: on-failure
 
 volumes:
   postgres_data:

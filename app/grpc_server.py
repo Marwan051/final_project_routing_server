@@ -10,11 +10,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from routing_module.database import PostgresConnector
 from routing_module.routing import (
     find_journeys,
-    load_traffic,
     explore_trips,
-    TripPricePredictor,
+    get_routing_engine,
 )
 from routing_module.network import create_network
+from routing_module.price_predictor import TripPricePredictor
 import osmnx as ox
 
 # Import generated gRPC code
@@ -23,7 +23,6 @@ import routing_pb2_grpc
 
 # Make TripPricePredictor available in __main__ for pickle to find it
 import __main__
-
 __main__.TripPricePredictor = TripPricePredictor
 
 # Global variables to store loaded data
@@ -31,22 +30,22 @@ graph = None
 gtfs_data = None
 trip_graph = None
 pathways_dict = None
-traffic = None
+routing_engine = None
 
 
 def initialize_network():
     """Load all network data at startup"""
-    global graph, gtfs_data, trip_graph, pathways_dict, traffic
+    global graph, gtfs_data, trip_graph, pathways_dict, routing_engine
 
     print("=" * 60)
     print("Loading network data at startup...")
     print("=" * 60)
 
+    # Initialize routing engine (loads model once)
+    routing_engine = get_routing_engine()
+
     # Create the network
     graph, gtfs_data, trip_graph, pathways_dict = create_network()
-
-    # Load traffic data
-    traffic = load_traffic()
 
     print("\n" + "=" * 60)
     print("Server ready! All data loaded.")
@@ -70,7 +69,7 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
                 graph is None
                 or trip_graph is None
                 or pathways_dict is None
-                or traffic is None
+                or routing_engine is None
             ):
                 context.set_code(grpc.StatusCode.UNAVAILABLE)
                 context.set_details(
@@ -116,7 +115,7 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
                 start_trips=start_trips,
                 goal_trips=target_trips,
                 max_transfers=request.max_transfers,
-                traffic=traffic,
+                traffic=routing_engine.load_traffic(),
             )
 
             # Format results for gRPC response

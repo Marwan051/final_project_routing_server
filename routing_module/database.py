@@ -3,7 +3,6 @@ import psycopg2
 from psycopg2 import OperationalError
 import logging
 
-# Add this import for reading the .env file
 from dotenv import load_dotenv
 
 # Configure logging
@@ -17,18 +16,12 @@ from psycopg2 import OperationalError
 
 
 class PostgresConnector:
-    """
-    A Singleton class for managing the PostgreSQL database connection.
-    Connection parameters are read from environment variables.
-    """
-
     _instance = None
     _connection = None
 
     def __new__(cls):
         """
-        Implementation of the Singleton pattern.
-        Ensures only one instance of the class is created.
+        Singleton pattern
         """
         if cls._instance is None:
             cls._instance = super(PostgresConnector, cls).__new__(cls)
@@ -57,7 +50,7 @@ class PostgresConnector:
         self.connect()
 
     def connect(self):
-        """Establishes or re-establishes the database connection."""
+        """Establishes or re-establishes the database connection with retry logic."""
         if self._connection is not None:
             # If already connected, close the old connection first (optional, but clean)
             try:
@@ -66,22 +59,32 @@ class PostgresConnector:
             except OperationalError:
                 pass  # Connection might already be closed/broken
 
-        try:
-            self._connection = psycopg2.connect(
-                database=self.db_name,
-                user=self.db_user,
-                password=self.db_password,
-                host=self.db_host,
-                port=self.db_port,
-            )
-            print(
-                f"✅ Database connected successfully to {self.db_host}:{self.db_port}/{self.db_name}"
-            )
-        except OperationalError as e:
-            print(f"❌ Connection attempt failed: {e}")
-            self._connection = None
-            # Re-raise to stop execution if connection is critical
-            raise
+        # Retry logic for container startup delays
+        import time
+        max_retries = 30
+        retry_delay = 2  # seconds
+        
+        for attempt in range(1, max_retries + 1):
+            try:
+                self._connection = psycopg2.connect(
+                    database=self.db_name,
+                    user=self.db_user,
+                    password=self.db_password,
+                    host=self.db_host,
+                    port=self.db_port,
+                )
+                print(
+                    f"✅ Database connected successfully to {self.db_host}:{self.db_port}/{self.db_name}"
+                )
+                return  # Success, exit retry loop
+            except OperationalError as e:
+                if attempt < max_retries:
+                    print(f"⏳ Connection attempt {attempt}/{max_retries} failed, retrying in {retry_delay}s...")
+                    time.sleep(retry_delay)
+                else:
+                    print(f"❌ All {max_retries} connection attempts failed: {e}")
+                    self._connection = None
+                    raise  # Re-raise after all retries exhausted
 
     def close(self):
         """Closes the active database connection."""

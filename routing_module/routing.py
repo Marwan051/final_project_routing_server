@@ -1,94 +1,130 @@
-import numpy as np
-import pandas as pd
 import json
 import heapq
 import os
 from collections import deque, defaultdict
-from joblib import load
-from sklearn.base import BaseEstimator, RegressorMixin
-
-from sklearn.pipeline import Pipeline
 
 from routing_module.database import PostgresConnector
+from routing_module.price_predictor import TripPricePredictor, load_model
 
 
-class TripPricePredictor(BaseEstimator, RegressorMixin):
-    def __init__(self, model):
-        self.model = model
+class RoutingEngine:
+    """Routing engine that loads the price prediction model once at startup."""
 
-    def _round_bus_style(self, vals):
-        """Custom rounding logic for bus fare"""
-        scalar = np.isscalar(vals)
-        arr = np.array([vals]) if scalar else np.asarray(vals)
-        out = []
-        for v in arr:
-            pounds = int(np.floor(v))
-            dec = v - pounds
-            if dec < 0.125:
-                r = pounds + 0.0
-            elif dec < 0.375:
-                r = pounds + 0.25
-            elif dec < 0.75:
-                r = pounds + 0.5
-            else:
-                r = pounds + 1.0
-            out.append(round(r, 2))
-        return out[0] if scalar else np.array(out)
+    def __init__(self, model_path=None):
+        """Initialize the routing engine and load the price prediction model.
 
-    def predict(self, distance_km):
-        # 1. Preprocessing: Convert KM to Log Distance
-        X = np.array(distance_km)
-        if X.ndim == 1:
-            X = X.reshape(-1, 1)
+        Args:
+            model_path: Path to the price prediction model file
+        """
+        self.db = PostgresConnector()
+        self.price_predictor = load_model(model_path)
+        if not isinstance(self.price_predictor, TripPricePredictor):
+            raise TypeError(
+                f"Expected TripPricePredictor, got {type(self.price_predictor)}"
+            )
+        self._traffic = None
 
-        X_log = np.log1p(X)
-
-        # 2. Prediction
-        raw_pred = self.model.predict(X_log)
-
-        # 3. Post-processing: Custom Rounding
-        return self._round_bus_style(raw_pred)
-
-
-def load_model(model_path=None):
-    """Load the trip price prediction model"""
-    if model_path is None:
-        # Default to data/utils/trip_price_model.joblib relative to this file
-        model_path = os.path.join(
-            os.path.dirname(__file__), "data", "utils", "trip_price_model.joblib"
+    def get_distance(self, trip_id, start_stop, end_stop):
+        """Get distance for a trip between two stops"""
+        return self.db.get_distance_between_two_stops_within_route(
+            trip_id, start_stop, end_stop
         )
-    # Load the model - it might already be a TripPricePredictor or just the sklearn model
-    loaded_model = load(model_path)
 
-    # If it's already a TripPricePredictor, return it directly
-    if isinstance(loaded_model, TripPricePredictor):
-        return loaded_model
+    def get_distance_coord(self, trip_id, start_lat, start_lon, end_lat, end_lon):
+        """Get distance between two coordinates along a route"""
+        return self.db.get_distance_between_two_coordinates_within_route(
+            trip_id, start_lat, start_lon, end_lat, end_lon
+        )
 
-    # Otherwise, wrap it in TripPricePredictor
-    return TripPricePredictor(loaded_model)
+    def get_cost(self, trip_id, start_stop, end_stop):
+        """Calculate the cost of a trip between two stops"""
+        distance = self.get_distance(trip_id, start_stop, end_stop)
+        return self.price_predictor.predict([distance])[0]
+
+    def load_traffic(self, traffic_path=None):
+        """Load and cache traffic/timing data from JSON"""
+        if self._traffic is None:
+            if traffic_path is None:
+                traffic_path = os.path.join(
+                    os.path.dirname(__file__), "data", "prefixtimes.json"
+                )
+            with open(traffic_path, "r") as file:
+                self._traffic = json.load(file)
+        return self._traffic
+
+    def get_transport_time(self, trip_id, start_stop, end_stop, traffic=None):
+        """Return travel time (seconds/minutes as stored) between two stops for a trip."""
+        if traffic is None:
+            traffic = self.load_traffic()
+
+        start = str(start_stop)
+        end = str(end_stop)
+        if trip_id not in traffic:
+            raise KeyError(f"trip_id not found in traffic: '{trip_id}'")
+        trip_times = traffic[trip_id]
+        if start not in trip_times:
+            raise KeyError(f"start_stop not found for trip '{trip_id}': '{start}'")
+        if end not in trip_times:
+            raise KeyError(f"end_stop not found for trip '{trip_id}': '{end}'")
+
+        start_val = trip_times[start]
+        end_val = trip_times[end]
+        try:
+            start_num = float(start_val)
+        except Exception as e:
+            raise ValueError(
+                f"start_stop value is not numeric for trip '{trip_id}': start='{start}', value={start_val!r}"
+            ) from e
+        try:
+            end_num = float(end_val)
+        except Exception as e:
+            raise ValueError(
+                f"end_stop value is not numeric for trip '{trip_id}': end='{end}', value={end_val!r}"
+            ) from e
+
+        return end_num - start_num
 
 
+# Global instance (can be initialized once at app startup)
+_routing_engine = None
+
+
+def get_routing_engine(model_path=None):
+    """Get or create the global routing engine instance."""
+    global _routing_engine
+    if _routing_engine is None:
+        _routing_engine = RoutingEngine(model_path)
+    return _routing_engine
+
+
+# Legacy function wrappers for backward compatibility
 def get_distance(trip_id, start_stop, end_stop, distances_path=None):
     """Get distance for a trip between two stops"""
-    return PostgresConnector().get_distance_between_two_stops_within_route(
-        trip_id, start_stop, end_stop
-    )
+    engine = get_routing_engine()
+    return engine.get_distance(trip_id, start_stop, end_stop)
 
 
-# TODO: talk to database (start coord,end coord)
 def get_distance_coord(trip_id, start_lat, start_lon, end_lat, end_lon):
-    db = PostgresConnector()
-    dist = db.get_distance_between_two_coordinates_within_route(
-        trip_id, start_lat, start_lon, end_lat, end_lon
-    )
+    engine = get_routing_engine()
+    return engine.get_distance_coord(trip_id, start_lat, start_lon, end_lat, end_lon)
 
 
 def get_cost(trip_id, start_stop, end_stop, distances_path=None, model_path=None):
     """Calculate the cost of a trip between two stops"""
-    distance = get_distance(trip_id, start_stop, end_stop, distances_path)
-    model = load_model(model_path)
+    engine = get_routing_engine(model_path)
+    return engine.get_cost(trip_id, start_stop, end_stop)
 
-    return model.predict([distance])[0]
+
+def load_traffic(traffic_path=None):
+    """Load traffic/timing data from JSON"""
+    engine = get_routing_engine()
+    return engine.load_traffic(traffic_path)
+
+
+def get_transport_time(trip_id, start_stop, end_stop, traffic=None):
+    """Return travel time (seconds/minutes as stored) between two stops for a trip."""
+    engine = get_routing_engine()
+    return engine.get_transport_time(trip_id, start_stop, end_stop, traffic)
 
 
 def load_traffic(traffic_path=None):
@@ -220,8 +256,10 @@ def find_journeys(
     Returns:
         List of tuples (path, costs) where path is list of trip_ids and costs is dict
     """
+    engine = get_routing_engine()
+
     if traffic is None:
-        traffic = load_traffic()
+        traffic = engine.load_traffic()
 
     results = []
     # (current_trip_id, current_board_stop_id, path_list, cumulative_costs)
@@ -249,8 +287,10 @@ def find_journeys(
         if start_trip_id in goal_trips:
             goal_stop = goal_trips[start_trip_id]["stop_id"]
 
-            leg_money = get_cost(start_trip_id, start_stop, goal_stop)
-            leg_time = get_transport_time(start_trip_id, start_stop, goal_stop, traffic)
+            leg_money = engine.get_cost(start_trip_id, start_stop, goal_stop)
+            leg_time = engine.get_transport_time(
+                start_trip_id, start_stop, goal_stop, traffic
+            )
 
             final_costs = costs.copy()
             final_costs["money"] += leg_money
@@ -277,10 +317,10 @@ def find_journeys(
             transfer_walk_cost = pathway["walking_distance_m"]
 
             # 2. Cost of the PREVIOUS trip segment
-            prev_trip_money = get_cost(
+            prev_trip_money = engine.get_cost(
                 current_trip, current_board_stop, pathway["start_stop_id"]
             )
-            prev_trip_time = get_transport_time(
+            prev_trip_time = engine.get_transport_time(
                 current_trip, current_board_stop, pathway["start_stop_id"], traffic
             )
 
@@ -320,10 +360,10 @@ def find_journeys(
                     goal_stop = goal_trips[next_trip]["stop_id"]
 
                     # FINAL leg cost
-                    last_leg_money = get_cost(
+                    last_leg_money = engine.get_cost(
                         next_trip, pathway["end_stop_id"], goal_stop
                     )
-                    last_leg_time = get_transport_time(
+                    last_leg_time = engine.get_transport_time(
                         next_trip, pathway["end_stop_id"], goal_stop, traffic
                     )
 
@@ -335,109 +375,3 @@ def find_journeys(
                     results.append((new_path, final_journey_costs))
 
     return results
-
-
-def _estimator_to_dict(estimator):
-    """Convert an sklearn estimator (or pipeline) to a serializable dict.
-
-    - Uses `get_params()` for general params.
-    - Adds `coef_`, `intercept_`, and `feature_importances_` if present.
-    - If the estimator is a Pipeline, extracts step info recursively.
-    """
-    if estimator is None:
-        return None
-
-    # If wrapped in TripPricePredictor, unwrap
-    if isinstance(estimator, TripPricePredictor):
-        estimator = estimator.model
-
-    result = {}
-
-    # Basic params
-    try:
-        params = estimator.get_params(deep=False)
-        # Convert any non-serializable values to strings
-        safe_params = {}
-        for k, v in params.items():
-            try:
-                json.dumps({k: v})
-                safe_params[k] = v
-            except Exception:
-                safe_params[k] = str(v)
-        result["params"] = safe_params
-    except Exception:
-        result["params"] = str(
-            getattr(estimator, "__class__", type(estimator)).__name__
-        )
-
-    # Coefficients / intercept
-    if hasattr(estimator, "coef_"):
-        try:
-            coef = estimator.coef_
-            result["coef"] = coef.tolist() if hasattr(coef, "tolist") else coef
-        except Exception:
-            result["coef"] = str(getattr(estimator, "coef_", None))
-
-    if hasattr(estimator, "intercept_"):
-        try:
-            intercept = estimator.intercept_
-            result["intercept"] = (
-                intercept.tolist() if hasattr(intercept, "tolist") else intercept
-            )
-        except Exception:
-            result["intercept"] = str(getattr(estimator, "intercept_", None))
-
-    # Feature importances (tree-based)
-    if hasattr(estimator, "feature_importances_"):
-        try:
-            fi = estimator.feature_importances_
-            result["feature_importances"] = fi.tolist() if hasattr(fi, "tolist") else fi
-        except Exception:
-            result["feature_importances"] = str(
-                getattr(estimator, "feature_importances_", None)
-            )
-
-    # Pipeline handling
-    if isinstance(estimator, Pipeline):
-        steps_info = []
-        for name, step in estimator.steps:
-            steps_info.append(
-                {
-                    "name": name,
-                    "class": step.__class__.__name__,
-                    "estimator": _estimator_to_dict(step),
-                }
-            )
-        result["pipeline"] = steps_info
-
-    return result
-
-
-def extract_model_params(model_path=None, out_path=None):
-    """Load the saved model and return a JSON-serializable dictionary of its parameters.
-
-    If `out_path` is provided, the resulting dict will be written to that file.
-    """
-    if model_path is None:
-        model_path = os.path.join(
-            os.path.dirname(__file__), "data", "utils", "trip_price_model.joblib"
-        )
-
-    loaded = load(model_path)
-
-    # If the saved object is the wrapper, use it; otherwise wrap
-    if isinstance(loaded, TripPricePredictor):
-        estimator = loaded
-    else:
-        estimator = TripPricePredictor(loaded)
-
-    info = {
-        "class": estimator.__class__.__name__,
-        "wrapped_model": _estimator_to_dict(estimator),
-    }
-
-    if out_path:
-        with open(out_path, "w") as f:
-            json.dump(info, f, indent=2)
-
-    return info
