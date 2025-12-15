@@ -4,24 +4,20 @@ import os
 from collections import deque, defaultdict
 
 from routing_module.database import PostgresConnector
-from routing_module.price_predictor import TripPricePredictor, load_model
+from routing_module.price_predictor import TripPricePredictor
 
 
 class RoutingEngine:
     """Routing engine that loads the price prediction model once at startup."""
 
-    def __init__(self, model_path=None):
-        """Initialize the routing engine and load the price prediction model.
+    def __init__(self, params_path=None):
+        """Initialize the routing engine and load the price prediction model parameters.
 
         Args:
-            model_path: Path to the price prediction model file
+            params_path: Path to the model params JSON file
         """
         self.db = PostgresConnector()
-        self.price_predictor = load_model(model_path)
-        if not isinstance(self.price_predictor, TripPricePredictor):
-            raise TypeError(
-                f"Expected TripPricePredictor, got {type(self.price_predictor)}"
-            )
+        self.price_predictor = TripPricePredictor(params_path=params_path)
         self._traffic = None
 
     def get_distance(self, trip_id, start_stop, end_stop):
@@ -89,11 +85,11 @@ class RoutingEngine:
 _routing_engine = None
 
 
-def get_routing_engine(model_path=None):
+def get_routing_engine(params_path=None):
     """Get or create the global routing engine instance."""
     global _routing_engine
     if _routing_engine is None:
-        _routing_engine = RoutingEngine(model_path)
+        _routing_engine = RoutingEngine(params_path)
     return _routing_engine
 
 
@@ -108,9 +104,9 @@ def get_distance_coord(trip_id, start_lat, start_lon, end_lat, end_lon):
     return engine.get_distance_coord(trip_id, start_lat, start_lon, end_lat, end_lon)
 
 
-def get_cost(trip_id, start_stop, end_stop, distances_path=None, model_path=None):
+def get_cost(trip_id, start_stop, end_stop, distances_path=None, params_path=None):
     """Calculate the cost of a trip between two stops"""
-    engine = get_routing_engine(model_path)
+    engine = get_routing_engine(params_path)
     return engine.get_cost(trip_id, start_stop, end_stop)
 
 
@@ -374,3 +370,88 @@ def find_journeys(
                     results.append((new_path, final_journey_costs))
 
     return results
+
+
+def find_route(
+    start_lat,
+    start_lon,
+    end_lat,
+    end_lon,
+    walking_cutoff,
+    max_transfers,
+    graph,
+    trip_graph,
+    pathways_dict,
+    routing_engine,
+):
+    """
+    High-level function to find routes from start to end coordinates.
+
+    Args:
+        start_lat: Starting latitude
+        start_lon: Starting longitude
+        end_lat: Ending latitude
+        end_lon: Ending longitude
+        walking_cutoff: Maximum walking distance in meters
+        max_transfers: Maximum number of transfers allowed
+        graph: OSM street network graph
+        trip_graph: Transit trip graph
+        pathways_dict: Dictionary of pathways between trips
+        routing_engine: RoutingEngine instance
+
+    Returns:
+        dict with keys:
+            'journeys': List of (path, costs) tuples
+            'start_trips_found': Number of start trips found
+            'end_trips_found': Number of end trips found
+            'error': Error message if any (None otherwise)
+            'error_type': Type of error ('start_trips', 'end_trips', or None)
+    """
+    import osmnx as ox
+
+    # Find nearest nodes to start and end coordinates
+    start_node = ox.distance.nearest_nodes(graph, X=start_lon, Y=start_lat)
+    end_node = ox.distance.nearest_nodes(graph, X=end_lon, Y=end_lat)
+
+    # Explore reachable trips from start location
+    start_trips = explore_trips(graph, start_node, cutoff=walking_cutoff)
+
+    # Explore reachable trips from end location
+    target_trips = explore_trips(graph, end_node, cutoff=walking_cutoff)
+
+    # Check if we found any trips
+    if not start_trips:
+        return {
+            "journeys": [],
+            "start_trips_found": 0,
+            "end_trips_found": len(target_trips),
+            "error": f"No transit trips found within {walking_cutoff}m of start location",
+            "error_type": "start_trips",
+        }
+
+    if not target_trips:
+        return {
+            "journeys": [],
+            "start_trips_found": len(start_trips),
+            "end_trips_found": 0,
+            "error": f"No transit trips found within {walking_cutoff}m of end location",
+            "error_type": "end_trips",
+        }
+
+    # Find journeys
+    journeys = find_journeys(
+        graph=trip_graph,
+        pathways_dict=pathways_dict,
+        start_trips=start_trips,
+        goal_trips=target_trips,
+        max_transfers=max_transfers,
+        traffic=routing_engine.load_traffic(),
+    )
+
+    return {
+        "journeys": journeys,
+        "start_trips_found": len(start_trips),
+        "end_trips_found": len(target_trips),
+        "error": None,
+        "error_type": None,
+    }
