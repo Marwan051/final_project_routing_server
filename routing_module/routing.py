@@ -97,8 +97,7 @@ def get_routing_engine(model_path=None):
     return _routing_engine
 
 
-# Legacy function wrappers for backward compatibility
-def get_distance(trip_id, start_stop, end_stop, distances_path=None):
+def get_distance(trip_id, start_stop, end_stop):
     """Get distance for a trip between two stops"""
     engine = get_routing_engine()
     return engine.get_distance(trip_id, start_stop, end_stop)
