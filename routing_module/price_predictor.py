@@ -9,8 +9,54 @@ from sklearn.pipeline import Pipeline
 
 
 class TripPricePredictor(BaseEstimator, RegressorMixin):
-    def __init__(self, model):
-        self.model = model
+    def __init__(self, coef=None, intercept=None, model=None):
+        """
+        Initialize predictor with either:
+        - coef and intercept (extracted from model)
+        - model (sklearn model to extract params from)
+        """
+        if model is not None:
+            # Extract coefficients and intercept from the loaded model
+            self.coef_ = self._extract_coef(model)
+            self.intercept_ = self._extract_intercept(model)
+        elif coef is not None and intercept is not None:
+            self.coef_ = np.array(coef) if not isinstance(coef, np.ndarray) else coef
+            self.intercept_ = float(intercept)
+        else:
+            raise ValueError("Must provide either model or (coef and intercept)")
+
+    def __setstate__(self, state):
+        """Handle unpickling of old TripPricePredictor instances that had self.model"""
+        self.__dict__.update(state)
+
+        # If this is an old instance with 'model' attribute, extract parameters
+        if hasattr(self, "model") and not hasattr(self, "coef_"):
+            self.coef_ = self._extract_coef(self.model)
+            self.intercept_ = self._extract_intercept(self.model)
+            # Remove the model to save memory
+            delattr(self, "model")
+
+    def _extract_coef(self, model):
+        """Extract coefficient from sklearn model (handles Ridge, LinearRegression, etc.)"""
+        if hasattr(model, "coef_"):
+            coef = model.coef_
+            # Handle both 1D and 2D coefficient arrays
+            if coef.ndim == 2:
+                return coef[0]  # Take first row for single-output regression
+            return coef
+        else:
+            raise ValueError(f"Model {type(model)} does not have coef_ attribute")
+
+    def _extract_intercept(self, model):
+        """Extract intercept from sklearn model"""
+        if hasattr(model, "intercept_"):
+            intercept = model.intercept_
+            # Handle both scalar and array intercepts
+            if isinstance(intercept, np.ndarray):
+                return float(intercept[0]) if len(intercept) > 0 else 0.0
+            return float(intercept)
+        else:
+            raise ValueError(f"Model {type(model)} does not have intercept_ attribute")
 
     def _round_bus_style(self, vals):
         """Custom rounding logic for bus fare"""
@@ -39,8 +85,9 @@ class TripPricePredictor(BaseEstimator, RegressorMixin):
 
         X_log = np.log1p(X)
 
-        # 2. Prediction
-        raw_pred = self.model.predict(X_log)
+        # 2. Manual prediction using extracted coefficients
+        # y = coef * x + intercept
+        raw_pred = (X_log * self.coef_).sum(axis=1) + self.intercept_
 
         # 3. Post-processing: Custom Rounding
         return self._round_bus_style(raw_pred)
@@ -74,9 +121,17 @@ def _estimator_to_dict(estimator):
     if estimator is None:
         return None
 
-    # If wrapped in TripPricePredictor, unwrap
+    # If wrapped in TripPricePredictor, use its extracted coefficients
     if isinstance(estimator, TripPricePredictor):
-        estimator = estimator.model
+        return {
+            "class": "TripPricePredictor",
+            "coef": (
+                estimator.coef_.tolist()
+                if hasattr(estimator.coef_, "tolist")
+                else estimator.coef_
+            ),
+            "intercept": float(estimator.intercept_),
+        }
 
     result = {}
 

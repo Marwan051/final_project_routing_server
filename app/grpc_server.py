@@ -56,13 +56,14 @@ def initialize_network():
 class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
     """Implementation of RoutingService"""
 
-    def HealthCheck(self, request, context):
+    def HealthCheck(self, _, context: grpc.ServicerContext):
         """Health check endpoint"""
+        context.set_code(grpc.StatusCode.OK)
         return routing_pb2.HealthResponse(
             status="healthy", message="Transit Routing gRPC Service is running"
         )
 
-    def FindRoute(self, request, context):
+    def FindRoute(self, request, context: grpc.ServicerContext):
         """Find transit routes between start and end coordinates"""
         try:
             # Validate that network data is loaded
@@ -146,7 +147,6 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
 
 
 def serve():
-    """Start the gRPC server"""
     # Initialize network data
     initialize_network()
 

@@ -5,7 +5,6 @@ import logging
 
 from dotenv import load_dotenv
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -74,19 +73,19 @@ class PostgresConnector:
                     port=self.db_port,
                 )
                 print(
-                    f"✅ Database connected successfully to {self.db_host}:{self.db_port}/{self.db_name}"
+                    f"Database connected successfully to {self.db_host}:{self.db_port}/{self.db_name}"
                 )
                 return  # Success, exit retry loop
             except OperationalError as e:
                 if attempt < max_retries:
                     print(
-                        f"⏳ Connection attempt {attempt}/{max_retries} failed, retrying in {retry_delay}s..."
+                        f"Connection attempt {attempt}/{max_retries} failed, retrying in {retry_delay}s..."
                     )
                     time.sleep(retry_delay)
                 else:
-                    print(f"❌ All {max_retries} connection attempts failed: {e}")
+                    print(f"All {max_retries} connection attempts failed: {e}")
                     self._connection = None
-                    raise  # Re-raise after all retries exhausted
+                    raise
 
     def close(self):
         """Closes the active database connection."""
@@ -94,7 +93,7 @@ class PostgresConnector:
             try:
                 self._connection.close()
                 self._connection = None
-                print("👋 Database connection closed.")
+                print("Database connection closed.")
             except OperationalError as e:
                 print(f"Error closing connection: {e}")
 
