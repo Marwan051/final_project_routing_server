@@ -6,7 +6,6 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from routing_module.database import PostgresConnector
 from routing_module.routing import (
     find_route,
     get_routing_engine,
@@ -47,7 +46,11 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
             status="healthy", message="Transit Routing gRPC Service is running"
         )
 
-    def FindRoute(self, request, context: grpc.ServicerContext):
+    def FindRoute(
+        self,
+        request: routing_pb2.RouteRequest,
+        context: grpc.ServicerContext,
+    ) -> routing_pb2.RouteResponse:
         try:
             if (
                 graph is None

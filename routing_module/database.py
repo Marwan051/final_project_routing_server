@@ -33,6 +33,7 @@ class PostgresConnector:
             self.db_password = os.environ["PG_PASSWORD"]
             self.db_host = os.environ.get("PG_HOST", "localhost")
             self.db_port = os.environ.get("PG_PORT", "5432")
+            self.db_sslmode = os.environ.get("PGSSLMODE", "prefer")
 
         except KeyError as e:
             raise EnvironmentError(
@@ -59,9 +60,10 @@ class PostgresConnector:
                     password=self.db_password,
                     host=self.db_host,
                     port=self.db_port,
+                    sslmode=self.db_sslmode,
                 )
                 logger.info(
-                    f"Database connected successfully to {self.db_host}:{self.db_port}/{self.db_name}"
+                    f"Database connected successfully to {self.db_host}:{self.db_port}/{self.db_name} (sslmode={self.db_sslmode})"
                 )
                 return
             except OperationalError as e:
