@@ -32,10 +32,13 @@ class RoutingEngine:
             trip_id, start_lat, start_lon, end_lat, end_lon
         )
 
-    def get_cost(self, trip_id, start_stop, end_stop):
-        """Calculate the cost of a trip between two stops"""
+    def get_fare(self, trip_id, start_stop, end_stop, agency='P_O_14'):
+        """Calculate the fare of a trip between two stops"""
+        passengers = 14
+        if agency == 'P_B_8': 
+            passengers = 8
         distance = self.get_distance(trip_id, start_stop, end_stop)
-        return self.price_predictor.predict([distance])[0]
+        return self.price_predictor.predict(distance, passengers)
 
     def load_traffic(self, traffic_path=None):
         """Load and cache traffic/timing data from JSON"""
@@ -282,7 +285,7 @@ def find_journeys(
         if start_trip_id in goal_trips:
             goal_stop = goal_trips[start_trip_id]["stop_id"]
 
-            leg_money = engine.get_cost(start_trip_id, start_stop, goal_stop)
+            leg_money = engine.get_fare(start_trip_id, start_stop, goal_stop)
             leg_time = engine.get_transport_time(
                 start_trip_id, start_stop, goal_stop, traffic
             )
@@ -312,7 +315,7 @@ def find_journeys(
             transfer_walk_cost = pathway["walking_distance_m"]
 
             # 2. Cost of the PREVIOUS trip segment
-            prev_trip_money = engine.get_cost(
+            prev_trip_money = engine.get_fare(
                 current_trip, current_board_stop, pathway["start_stop_id"]
             )
             prev_trip_time = engine.get_transport_time(
@@ -355,7 +358,7 @@ def find_journeys(
                     goal_stop = goal_trips[next_trip]["stop_id"]
 
                     # FINAL leg cost
-                    last_leg_money = engine.get_cost(
+                    last_leg_money = engine.get_fare(
                         next_trip, pathway["end_stop_id"], goal_stop
                     )
                     last_leg_time = engine.get_transport_time(
