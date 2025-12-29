@@ -73,13 +73,13 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
             for journey_dict in result["journeys"]:
                 # Extract basic info from enriched journey for gRPC
                 summary = journey_dict["summary"]
-                
+
                 # Extract trip path from legs (only trip legs, not walk/transfer)
                 trip_path = []
                 for leg in journey_dict["legs"]:
                     if leg["type"] == "trip":
                         trip_path.append(leg["trip_id"])
-                
+
                 journey = routing_pb2.Journey(
                     path=trip_path,
                     costs=routing_pb2.JourneyCosts(
