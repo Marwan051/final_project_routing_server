@@ -228,7 +228,8 @@ def create_network(osm_file=None, gtfs_path=None, pathways_file=None):
         pathways_file: Path to pathways CSV (defaults to data/trip_pathways.csv)
         
     Returns:
-        Tuple of (graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups)
+        Tuple of (graph, trip_graph, pathway_metadata, enrichment_lookups)
+        Note: gtfs_data is used internally but not returned as it's not needed by RoutingEngine
     """
     print("=" * 60)
     print("Starting Enhanced Network Creation Pipeline")
@@ -262,13 +263,11 @@ def create_network(osm_file=None, gtfs_path=None, pathways_file=None):
     print("Enhanced Network Creation Complete!")
     print("=" * 60)
     
-    return graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups
-
+    # Return in the order expected by RoutingEngine.set_graph_data()
+    return graph, trip_graph, pathway_metadata, enrichment_lookups
 
 if __name__ == "__main__":
-    # Example usage
-    graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups = create_network()
-    
+    graph, trip_graph, pathway_metadata, enrichment_lookups = create_network()
     # Print some statistics
     nodes_with_trips = sum(1 for n, data in graph.nodes(data=True) if 'access_map' in data)
     print(f"\nFinal Statistics:")

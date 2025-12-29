@@ -6,33 +6,24 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from routing_module.routing import (
-    find_route,
-    get_routing_engine,
-)
-from routing_module.network import create_network
+from routing_module.routing import create_routing_engine
 
 import routing_pb2
 import routing_pb2_grpc
 
-graph = None
-gtfs_data = None
-trip_graph = None
-pathway_metadata = None
-enrichment_lookups = None
-routing_engine = None
+# Global routing engine instance
+_routing_engine = None
 
 
 def initialize_network():
-    global graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups, routing_engine
+    global _routing_engine
 
     print("=" * 60)
     print("Loading network data at startup...")
     print("=" * 60)
 
-    routing_engine = get_routing_engine()
-
-    graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups = create_network()
+    # Use the convenience function to create and initialize everything
+    _routing_engine = create_routing_engine()
 
     print("\n" + "=" * 60)
     print("Server ready! All data loaded.")
@@ -53,32 +44,21 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
         context: grpc.ServicerContext,
     ) -> routing_pb2.RouteResponse:
         try:
-            if (
-                graph is None
-                or trip_graph is None
-                or pathway_metadata is None
-                or enrichment_lookups is None
-                or routing_engine is None
-            ):
+            if _routing_engine is None:
                 context.set_code(grpc.StatusCode.UNAVAILABLE)
                 context.set_details(
                     "Server is still loading network data. Please try again in a moment."
                 )
                 return routing_pb2.RouteResponse()
 
-            # Call the routing logic
-            result = find_route(
+            # Call the routing logic using the new RoutingEngine interface
+            result = _routing_engine.find_route(
                 start_lat=request.start_lat,
                 start_lon=request.start_lon,
                 end_lat=request.end_lat,
                 end_lon=request.end_lon,
                 walking_cutoff=request.walking_cutoff,
                 max_transfers=request.max_transfers,
-                graph=graph,
-                trip_graph=trip_graph,
-                pathway_metadata=pathway_metadata,
-                enrichment_lookups=enrichment_lookups,
-                routing_engine=routing_engine,
             )
 
             # Handle errors from routing
