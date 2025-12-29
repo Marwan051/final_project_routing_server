@@ -7,11 +7,18 @@ from routing_module.database import PostgresConnector
 from routing_module.price_predictor import TripPricePredictor
 
 
-def enrich_journey_results(lean_journeys, start_trips, target_trips, trip_graph, pathway_metadata, enrichment_lookups):
+def enrich_journey_results(
+    lean_journeys,
+    start_trips,
+    target_trips,
+    trip_graph,
+    pathway_metadata,
+    enrichment_lookups,
+):
     """
     Transform lean routing results into detailed frontend-ready JSON structure.
     Now uses enrichment_lookups dictionary instead of individual lookup parameters.
-    
+
     Args:
         lean_journeys: List of (trip_path, costs) tuples from routing
         start_trips: Start trips data
@@ -22,23 +29,23 @@ def enrich_journey_results(lean_journeys, start_trips, target_trips, trip_graph,
     """
     import ast
     import json
-    
+
     # Extract lookups from enrichment_lookups dictionary
-    trip_to_route = enrichment_lookups['trip_to_route']
-    route_to_name = enrichment_lookups['route_to_name']
-    route_to_short_name = enrichment_lookups['route_to_short_name']
-    trip_to_headsign = enrichment_lookups['trip_to_headsign']
-    stop_to_coords = enrichment_lookups['stop_to_coords']
-    stop_to_name = enrichment_lookups['stop_to_name']
-    
+    trip_to_route = enrichment_lookups["trip_to_route"]
+    route_to_name = enrichment_lookups["route_to_name"]
+    route_to_short_name = enrichment_lookups["route_to_short_name"]
+    trip_to_headsign = enrichment_lookups["trip_to_headsign"]
+    stop_to_coords = enrichment_lookups["stop_to_coords"]
+    stop_to_name = enrichment_lookups["stop_to_name"]
+
     detailed_journeys = []
-    
+
     for journey_idx, (trip_path, costs) in enumerate(lean_journeys):
         journey_id = f"journey_{journey_idx + 1}"
-        
+
         # Extract cost components (transfers, fare, time, walk)
         transfers, total_fare, total_time, total_walk = costs
-        
+
         legs = []
         total_distance = 0
         # modes_used = set(["walk"])  # Always includes walking
@@ -46,16 +53,20 @@ def enrich_journey_results(lean_journeys, start_trips, target_trips, trip_graph,
         # === 1. INITIAL WALKING LEG ===
         start_trip_id = trip_path[0]
         start_trip_data = start_trips[start_trip_id]
-        
-        if start_trip_data['walk'] > 0:
-            legs.append({
-                "type": "walk",
-                "distance_meters": round(start_trip_data['walk']),
-                "duration_minutes": max(1, int(start_trip_data['walk'] / 83.33)),  # 5 km/h = 83.33 m/min
-                "path": start_trip_data['path']
-            })
-            total_distance += start_trip_data['walk']
-        
+
+        if start_trip_data["walk"] > 0:
+            legs.append(
+                {
+                    "type": "walk",
+                    "distance_meters": round(start_trip_data["walk"]),
+                    "duration_minutes": max(
+                        1, int(start_trip_data["walk"] / 83.33)
+                    ),  # 5 km/h = 83.33 m/min
+                    "path": start_trip_data["path"],
+                }
+            )
+            total_distance += start_trip_data["walk"]
+
         # === 2. PROCESS TRIP LEGS AND TRANSFERS ===
         for i, current_trip_id in enumerate(trip_path):
             route_id = trip_to_route.get(current_trip_id)
@@ -64,52 +75,59 @@ def enrich_journey_results(lean_journeys, start_trips, target_trips, trip_graph,
             if route_short_name:
                 # Remove numbers and extra whitespace to get base transport type
                 import re
-                mode = re.sub(r'\d+', '', route_short_name).strip().lower()
+
+                mode = re.sub(r"\d+", "", route_short_name).strip().lower()
                 # Handle cases where there might be extra spaces after number removal
-                mode = ' '.join(mode.split())  # Normalize whitespace
+                mode = " ".join(mode.split())  # Normalize whitespace
             else:
                 mode = "unknown"
-            
+
             modes_used.add(mode)
-            
+
             # Determine trip segment details
             if i == 0:
                 # First trip: from start access point to transfer or destination
-                from_stop_id = start_trips[current_trip_id]['stop_id']
+                from_stop_id = start_trips[current_trip_id]["stop_id"]
                 from_coords = stop_to_coords.get(from_stop_id, {})
-                
+
                 if i == len(trip_path) - 1:
                     # Single trip journey: go to target
-                    to_stop_id = target_trips[current_trip_id]['stop_id']
+                    to_stop_id = target_trips[current_trip_id]["stop_id"]
                     to_coords = stop_to_coords.get(to_stop_id, {})
                 else:
                     # Multi-trip: go to transfer point
                     next_trip_id = trip_path[i + 1]
-                    lean_pathway = trip_graph.get(current_trip_id, {}).get(next_trip_id, {})
-                    to_stop_id = lean_pathway.get('start_stop_id')
+                    lean_pathway = trip_graph.get(current_trip_id, {}).get(
+                        next_trip_id, {}
+                    )
+                    to_stop_id = lean_pathway.get("start_stop_id")
                     to_coords = stop_to_coords.get(to_stop_id, {}) if to_stop_id else {}
             else:
                 # Subsequent trips: from transfer point
                 prev_trip_id = trip_path[i - 1]
                 lean_pathway = trip_graph.get(prev_trip_id, {}).get(current_trip_id, {})
-                from_stop_id = lean_pathway.get('end_stop_id')
-                from_coords = stop_to_coords.get(from_stop_id, {}) if from_stop_id else {}
-                
+                from_stop_id = lean_pathway.get("end_stop_id")
+                from_coords = (
+                    stop_to_coords.get(from_stop_id, {}) if from_stop_id else {}
+                )
+
                 if i == len(trip_path) - 1:
                     # Last trip: go to target
-                    to_stop_id = target_trips[current_trip_id]['stop_id']
+                    to_stop_id = target_trips[current_trip_id]["stop_id"]
                     to_coords = stop_to_coords.get(to_stop_id, {})
                 else:
                     # Go to next transfer
                     next_trip_id = trip_path[i + 1]
-                    lean_pathway = trip_graph.get(current_trip_id, {}).get(next_trip_id, {})
-                    to_stop_id = lean_pathway.get('start_stop_id')
+                    lean_pathway = trip_graph.get(current_trip_id, {}).get(
+                        next_trip_id, {}
+                    )
+                    to_stop_id = lean_pathway.get("start_stop_id")
                     to_coords = stop_to_coords.get(to_stop_id, {}) if to_stop_id else {}
-            
+
             # Calculate trip duration and fare (simplified)
             trip_duration = max(5, int(total_time / len(trip_path)))  # Rough estimate
             trip_fare = round(total_fare / len(trip_path), 2)  # Split fare across trips
-            
+
             # Add trip leg
             trip_leg = {
                 "type": "trip",
@@ -122,44 +140,52 @@ def enrich_journey_results(lean_journeys, start_trips, target_trips, trip_graph,
                 "from": {
                     "stop_id": from_stop_id,
                     "name": stop_to_name.get(from_stop_id, "Unknown Stop"),
-                    "coord": [from_coords.get('stop_lat', 0), from_coords.get('stop_lon', 0)]
+                    "coord": [
+                        from_coords.get("stop_lat", 0),
+                        from_coords.get("stop_lon", 0),
+                    ],
                 },
                 "to": {
                     "stop_id": to_stop_id,
                     "name": stop_to_name.get(to_stop_id, "Unknown Stop"),
-                    "coord": [to_coords.get('stop_lat', 0), to_coords.get('stop_lon', 0)]
+                    "coord": [
+                        to_coords.get("stop_lat", 0),
+                        to_coords.get("stop_lon", 0),
+                    ],
                 },
-                "path": []  # Could add route shape here
+                "path": [],  # Could add route shape here
             }
-            
+
             legs.append(trip_leg)
-            
+
             # === 3. ADD TRANSFER LEG (if not last trip) ===
             if i < len(trip_path) - 1:
                 next_trip_id = trip_path[i + 1]
                 pathway_key = (current_trip_id, next_trip_id)
-                
+
                 # Get transfer distance from lean pathway, walking coords from metadata
                 lean_pathway = trip_graph.get(current_trip_id, {}).get(next_trip_id, {})
-                transfer_distance = lean_pathway.get('walking_distance_m', 0)
-                
+                transfer_distance = lean_pathway.get("walking_distance_m", 0)
+
                 # Get walking coordinates from metadata (enrichment data)
                 pathway_key = (current_trip_id, next_trip_id)
                 walking_coords = []
                 if pathway_key in pathway_metadata:
                     pathway_info = pathway_metadata[pathway_key]
-                    from_trip_name = pathway_info['start_route_name']
-                    to_trip_name=  pathway_info['end_route_name']
+                    from_trip_name = pathway_info["start_route_name"]
+                    to_trip_name = pathway_info["end_route_name"]
                     try:
-                        if isinstance(pathway_info['walking_path_coords'], str):
-                            walking_coords = ast.literal_eval(pathway_info['walking_path_coords'])
+                        if isinstance(pathway_info["walking_path_coords"], str):
+                            walking_coords = ast.literal_eval(
+                                pathway_info["walking_path_coords"]
+                            )
                         else:
-                            walking_coords = pathway_info['walking_path_coords']
+                            walking_coords = pathway_info["walking_path_coords"]
                     except:
                         walking_coords = []
-                
+
                 transfer_duration = max(1, int(transfer_distance / 83.33))  # 5 km/h
-                
+
                 transfer_leg = {
                     "type": "transfer",
                     "from_trip_id": current_trip_id,
@@ -168,59 +194,68 @@ def enrich_journey_results(lean_journeys, start_trips, target_trips, trip_graph,
                     "to_trip_name": to_trip_name,
                     "walking_distance_meters": round(transfer_distance),
                     "duration_minutes": transfer_duration,
-                    "path": walking_coords
+                    "path": walking_coords,
                 }
-                
+
                 legs.append(transfer_leg)
                 total_distance += transfer_distance
-        
+
         # === 4. FINAL WALKING LEG TO DESTINATION ===
         final_trip_id = trip_path[-1]
-        final_walk = target_trips[final_trip_id]['walk']
-        
+        final_walk = target_trips[final_trip_id]["walk"]
+
         if final_walk > 0:
-            legs.append({
-                "type": "walk",
-                "distance_meters": round(final_walk),
-                "duration_minutes": max(1, int(final_walk / 83.33)),
-                "path": target_trips[final_trip_id]['path']
-            })
+            legs.append(
+                {
+                    "type": "walk",
+                    "distance_meters": round(final_walk),
+                    "duration_minutes": max(1, int(final_walk / 83.33)),
+                    "path": target_trips[final_trip_id]["path"],
+                }
+            )
             total_distance += final_walk
-        
+
         # === 5. BUILD JOURNEY SUMMARY ===
         # Create text summary for LLM consumption
-        summary_parts = [f"Total Duration: {int(total_time / 60) if total_time > 60 else int(total_time)} minutes, Total Cost: ${round(total_fare, 2)}, Transfers: {transfers}, Total Walking: {int(total_walk)}m"]
-        
+        summary_parts = [
+            f"Total Duration: {int(total_time / 60) if total_time > 60 else int(total_time)} minutes, Total Cost: ${round(total_fare, 2)}, Transfers: {transfers}, Total Walking: {int(total_walk)}m"
+        ]
+
         for leg in legs:
-            if leg['type'] == 'walk':
-                summary_parts.append(f"walk {leg['distance_meters']}m ({leg['duration_minutes']} min)")
-            elif leg['type'] == 'trip':
-                summary_parts.append(f"take {leg['route_short_name']} to {leg['headsign']} (${leg['fare']}, {leg['duration_minutes']} min) - Board at \"{leg['from']['name']}\", Exit at \"{leg['to']['name']}\"")
-            elif leg['type'] == 'transfer':
-                summary_parts.append(f"walk {leg['walking_distance_meters']}m ({leg['duration_minutes']} min) - Transfer from {leg['from_trip_name']} to {leg['to_trip_name']}")
-        
+            if leg["type"] == "walk":
+                summary_parts.append(
+                    f"walk {leg['distance_meters']}m ({leg['duration_minutes']} min)"
+                )
+            elif leg["type"] == "trip":
+                summary_parts.append(
+                    f"take {leg['route_short_name']} to {leg['headsign']} (${leg['fare']}, {leg['duration_minutes']} min) - Board at \"{leg['from']['name']}\", Exit at \"{leg['to']['name']}\""
+                )
+            elif leg["type"] == "transfer":
+                summary_parts.append(
+                    f"walk {leg['walking_distance_meters']}m ({leg['duration_minutes']} min) - Transfer from {leg['from_trip_name']} to {leg['to_trip_name']}"
+                )
+
         text_summary = ", ".join(summary_parts)
-        
+
         journey = {
             "id": journey_id,
             "text_summary": text_summary,
             "summary": {
-                "total_time_minutes": int(total_time / 60) if total_time > 60 else int(total_time),  # Convert if in seconds
+                "total_time_minutes": (
+                    int(total_time / 60) if total_time > 60 else int(total_time)
+                ),  # Convert if in seconds
                 "total_distance_meters": int(total_distance),
                 "walking_distance_meters": int(total_walk),
                 "transfers": transfers,
                 "cost": round(total_fare, 2),
-                "modes": sorted(list(modes_used))
+                "modes": sorted(list(modes_used)),
             },
-            "legs": legs
+            "legs": legs,
         }
-        
+
         detailed_journeys.append(journey)
-    
-    return {
-        "num_journeys": len(detailed_journeys),
-        "journeys": detailed_journeys
-    }
+
+    return {"num_journeys": len(detailed_journeys), "journeys": detailed_journeys}
 
 
 class RoutingEngine:
@@ -248,12 +283,12 @@ class RoutingEngine:
             trip_id, start_lat, start_lon, end_lat, end_lon
         )
 
-    def get_fare(self, trip_id, start_stop, end_stop, agency='P_O_14'):
+    def get_fare(self, trip_id, start_stop, end_stop, agency="P_O_14"):
         """Calculate the fare of a trip between two stops"""
         passengers = 14
-        if agency == 'P_B_8': 
+        if agency == "P_B_8":
             passengers = 8
-        distance = self.get_distance(trip_id, start_stop, end_stop)
+        distance = self.get_distance(trip_id, start_stop, end_stop) / 1000
         return self.price_predictor.predict(distance, passengers)
 
     def load_traffic(self, traffic_path=None):
@@ -413,15 +448,15 @@ def explore_trips(G, source, cutoff=float("inf")):
             node = prev[node]
         path.append(source)
         return list(reversed(path))
-    
+
     def reconstruct_path_coords(node):
         """Convert node path to coordinate path"""
         node_path = reconstruct_path(node)
         coord_path = []
         for node_id in node_path:
             if node_id in G.nodes:
-                lat = G.nodes[node_id]['y']
-                lon = G.nodes[node_id]['x']
+                lat = G.nodes[node_id]["y"]
+                lon = G.nodes[node_id]["x"]
                 coord_path.append([lat, lon])
         return coord_path
 
@@ -436,7 +471,7 @@ def explore_trips(G, source, cutoff=float("inf")):
 
         # [CHANGE]: Retrieve the access_map with enhanced information
         access_map = G.nodes[node].get("access_map")
-        
+
         # Fallback to boarding_map for backward compatibility
         if not access_map:
             access_map = G.nodes[node].get("boarding_map")
@@ -445,26 +480,32 @@ def explore_trips(G, source, cutoff=float("inf")):
                 converted_access_map = {}
                 for trip_id, real_stop_id in access_map.items():
                     converted_access_map[trip_id] = {
-                        'stop_id': real_stop_id,
-                        'agency_id': 'P_O_14',  # default agency
-                        'stop_sequence': None
+                        "stop_id": real_stop_id,
+                        "agency_id": "P_O_14",  # default agency
+                        "stop_sequence": None,
                     }
                 access_map = converted_access_map
-        
+
         if access_map:
             # Iterate over the trips available at this node
             for trip_id, access_info in access_map.items():
-                
+
                 # Check if this is the best walk to this trip so far
                 best = trips.get(trip_id)
                 if best is None or d < best["walk"]:
                     trips[trip_id] = {
-                        "stop_id": access_info['stop_id'], # GTFS stop ID
-                        "agency": access_info.get('agency_id', 'P_O_14'), # needed for fare calculation
-                        "stop_sequence": access_info.get('stop_sequence'), # Stop sequence in trip
-                        "osm_node_id": node, # OSM node ID
-                        "walk": d, # Walking distance
-                        "path": reconstruct_path_coords(node) # Walking path coordinates
+                        "stop_id": access_info["stop_id"],  # GTFS stop ID
+                        "agency": access_info.get(
+                            "agency_id", "P_O_14"
+                        ),  # needed for fare calculation
+                        "stop_sequence": access_info.get(
+                            "stop_sequence"
+                        ),  # Stop sequence in trip
+                        "osm_node_id": node,  # OSM node ID
+                        "walk": d,  # Walking distance
+                        "path": reconstruct_path_coords(
+                            node
+                        ),  # Walking path coordinates
                     }
 
         # Relax neighbors (Standard Dijkstra)
@@ -477,11 +518,11 @@ def explore_trips(G, source, cutoff=float("inf")):
                     dist[nbr] = new_dist
                     prev[nbr] = node
                     heapq.heappush(pq, (new_dist, nbr))
-    
+
     return trips
 
 
-def get_fare(model, trip_id, start_stop, end_stop, agency='P_O_14'):
+def get_fare(model, trip_id, start_stop, end_stop, agency="P_O_14"):
     """Get fare using the routing engine"""
     engine = get_routing_engine()
     return engine.get_fare(trip_id, start_stop, end_stop, agency)
@@ -494,22 +535,23 @@ def get_transport_time(trip_id, start_stop, end_stop, traffic=None):
     if traffic is None:
         traffic = engine.load_traffic()
 
+
 def find_journeys(graph, start_trips, goal_trips, max_transfers):
     results = []
     queue = deque()
-    
+
     # Pareto frontiers for each trip - Maps trip_id -> list of non-dominated cost vectors
     best = {}
-    
+
     # Get the model from routing engine (placeholder for now)
     model = None  # This will be used in get_fare function
-    
+
     def dominates(v1, v2):
         """Check if v1 dominates v2 (v1 is better or equal in all dimensions and strictly better in at least one)"""
         better_in_all = all(v1[i] <= v2[i] for i in range(4))
         strictly_better_in_one = any(v1[i] < v2[i] for i in range(4))
         return better_in_all and strictly_better_in_one
-    
+
     def update_pareto_frontier(frontier, new_cost):
         """Add new_cost to frontier and remove any vectors dominated by new_cost"""
         # Remove vectors dominated by new_cost
@@ -518,68 +560,70 @@ def find_journeys(graph, start_trips, goal_trips, max_transfers):
         if not any(dominates(v, new_cost) for v in frontier_updated):
             frontier_updated.append(new_cost)
         return frontier_updated
-    
+
     # --- 1. Initialize Start Trips ---
     for start_trip_id, data in start_trips.items():
         # Cost vector: (transfers, fare, time, walk)
-        c0 = (0, 0, 0, data['walk'])
+        c0 = (0, 0, 0, data["walk"])
         path = [start_trip_id]
-        start_stop = data['stop_id']
-        start_sequence = data['stop_sequence']
-        
+        start_stop = data["stop_id"]
+        start_sequence = data["stop_sequence"]
+
         queue.append((start_trip_id, start_stop, start_sequence, path, c0))
         best[start_trip_id] = [c0]
-        
+
         # Check 0-transfer goal
         if start_trip_id in goal_trips:
-            goal_stop = goal_trips[start_trip_id]['stop_id']
-            goal_seq = goal_trips[start_trip_id]['stop_sequence']
-            
+            goal_stop = goal_trips[start_trip_id]["stop_id"]
+            goal_seq = goal_trips[start_trip_id]["stop_sequence"]
+
             # [CHECK 1] If direction is invalid, ignore this result
             if start_sequence < goal_seq:
-                delta_fare = get_fare(model, start_trip_id, start_stop, goal_stop, data['agency'])
+                delta_fare = get_fare(
+                    model, start_trip_id, start_stop, goal_stop, data["agency"]
+                )
                 delta_time = get_transport_time(start_trip_id, start_stop, goal_stop)
-                
+
                 c_final = (
                     c0[0],  # transfers (0)
                     c0[1] + delta_fare,  # fare
                     c0[2] + delta_time,  # time
-                    c0[3] + goal_trips[start_trip_id]['walk']  # walk
+                    c0[3] + goal_trips[start_trip_id]["walk"],  # walk
                 )
                 results.append((path, c_final))
-    
+
     # --- 2. BFS with Pareto Pruning ---
     while queue:
-        (current_trip, current_board_stop, current_board_sequence, path, c) = queue.popleft()
-        
+        (current_trip, current_board_stop, current_board_sequence, path, c) = (
+            queue.popleft()
+        )
+
         if len(path) - 1 >= max_transfers:
             continue
-            
+
         for next_trip, lean_pathway in graph.get(current_trip, {}).items():
             # lean_pathway now contains only essential routing data
-            
-            if next_trip in path: 
+
+            if next_trip in path:
                 continue
 
             # [CHECK 2 - CRITICAL] Prune invalid path segment immediately
-            if current_board_sequence >= lean_pathway['start_stop_sequence']:
+            if current_board_sequence >= lean_pathway["start_stop_sequence"]:
                 continue
-            
+
             # --- Cost Logic ---
             # Calculate time for the segment we just rode
             prev_trip_time = get_transport_time(
-                current_trip, 
-                current_board_stop, 
-                lean_pathway['start_stop_id']
+                current_trip, current_board_stop, lean_pathway["start_stop_id"]
             )
 
             # Cost of the PREVIOUS trip segment
             prev_trip_money = get_fare(
                 model,
-                current_trip, 
-                current_board_stop, 
-                lean_pathway['start_stop_id'],
-                lean_pathway['start_agency_id']
+                current_trip,
+                current_board_stop,
+                lean_pathway["start_stop_id"],
+                lean_pathway["start_agency_id"],
             )
 
             # New cost vector: (transfers, fare, time, walk)
@@ -587,44 +631,60 @@ def find_journeys(graph, start_trips, goal_trips, max_transfers):
                 c[0] + 1,  # transfers
                 c[1] + prev_trip_money,  # fare
                 c[2] + prev_trip_time,  # time
-                c[3] + lean_pathway['walking_distance_m']  # walk
+                c[3] + lean_pathway["walking_distance_m"],  # walk
             )
-            
+
             # --- Pareto Pruning ---
             # Check if dominated by existing solutions for this trip
             if next_trip in best:
                 if any(dominates(v, c_new) for v in best[next_trip]):
                     continue
-            
+
             # Update Pareto frontier
             if next_trip not in best:
                 best[next_trip] = []
             best[next_trip] = update_pareto_frontier(best[next_trip], c_new)
-            
+
             new_path = path + [next_trip]
-            
+
             # We board the NEXT trip at lean_pathway['end_stop_id'] with sequence lean_pathway['end_stop_sequence']
-            queue.append((next_trip, lean_pathway['end_stop_id'], lean_pathway['end_stop_sequence'], new_path, c_new))
-            
+            queue.append(
+                (
+                    next_trip,
+                    lean_pathway["end_stop_id"],
+                    lean_pathway["end_stop_sequence"],
+                    new_path,
+                    c_new,
+                )
+            )
+
             # --- 3. Check Goal ---
             if next_trip in goal_trips:
-                goal_stop = goal_trips[next_trip]['stop_id']
+                goal_stop = goal_trips[next_trip]["stop_id"]
                 # [CHECK 3] if transfer-in sequence < goal sequence (valid forward direction)
-                transfer_in_seq = lean_pathway['end_stop_sequence']
-                goal_seq = goal_trips[next_trip]['stop_sequence']
+                transfer_in_seq = lean_pathway["end_stop_sequence"]
+                goal_seq = goal_trips[next_trip]["stop_sequence"]
                 if transfer_in_seq < goal_seq:
                     # FINAL leg cost (from transfer-in to goal-stop)
-                    last_leg_time = get_transport_time(next_trip, lean_pathway['end_stop_id'], goal_stop)
-                    last_leg_money = get_fare(model, next_trip, lean_pathway['end_stop_id'], goal_stop, goal_trips[next_trip]['agency'])
-                    
+                    last_leg_time = get_transport_time(
+                        next_trip, lean_pathway["end_stop_id"], goal_stop
+                    )
+                    last_leg_money = get_fare(
+                        model,
+                        next_trip,
+                        lean_pathway["end_stop_id"],
+                        goal_stop,
+                        goal_trips[next_trip]["agency"],
+                    )
+
                     c_final = (
                         c_new[0],  # transfers (unchanged)
                         c_new[1] + last_leg_money,  # fare
                         c_new[2] + last_leg_time,  # time
-                        c_new[3] + goal_trips[next_trip]['walk']  # walk
+                        c_new[3] + goal_trips[next_trip]["walk"],  # walk
                     )
                     results.append((new_path, c_final))
-    
+
     return results
 
 
@@ -711,7 +771,7 @@ def find_route(
         target_trips=target_trips,
         trip_graph=trip_graph,
         pathway_metadata=pathway_metadata,
-        enrichment_lookups=enrichment_lookups
+        enrichment_lookups=enrichment_lookups,
     )
 
     return {
