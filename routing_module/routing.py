@@ -34,7 +34,7 @@ class RoutingEngine:
 
     def get_cost(self, trip_id, start_stop, end_stop):
         """Calculate the cost of a trip between two stops"""
-        distance = self.get_distance(trip_id, start_stop, end_stop)
+        distance = self.get_distance(trip_id, start_stop, end_stop) / 1000
         return self.price_predictor.predict([distance])[0]
 
     def load_traffic(self, traffic_path=None):
@@ -448,8 +448,14 @@ def find_route(
         traffic=routing_engine.load_traffic(),
     )
 
+    # Sort journeys by: 1) number of transfers, 2) walking distance, 3) price
+    # Number of transfers = len(path) - 1
+    sorted_journeys = sorted(
+        journeys, key=lambda x: (len(x[0]) - 1, x[1]["walk"], x[1]["money"])
+    )
+
     return {
-        "journeys": journeys,
+        "journeys": sorted_journeys,
         "start_trips_found": len(start_trips),
         "end_trips_found": len(target_trips),
         "error": None,
