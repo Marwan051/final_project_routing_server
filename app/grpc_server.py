@@ -18,12 +18,13 @@ import routing_pb2_grpc
 graph = None
 gtfs_data = None
 trip_graph = None
-pathways_dict = None
+pathway_metadata = None
+enrichment_lookups = None
 routing_engine = None
 
 
 def initialize_network():
-    global graph, gtfs_data, trip_graph, pathways_dict, routing_engine
+    global graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups, routing_engine
 
     print("=" * 60)
     print("Loading network data at startup...")
@@ -31,7 +32,7 @@ def initialize_network():
 
     routing_engine = get_routing_engine()
 
-    graph, gtfs_data, trip_graph, pathways_dict = create_network()
+    graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups = create_network()
 
     print("\n" + "=" * 60)
     print("Server ready! All data loaded.")
@@ -55,7 +56,8 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
             if (
                 graph is None
                 or trip_graph is None
-                or pathways_dict is None
+                or pathway_metadata is None
+                or enrichment_lookups is None
                 or routing_engine is None
             ):
                 context.set_code(grpc.StatusCode.UNAVAILABLE)
@@ -74,7 +76,8 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
                 max_transfers=request.max_transfers,
                 graph=graph,
                 trip_graph=trip_graph,
-                pathways_dict=pathways_dict,
+                pathway_metadata=pathway_metadata,
+                enrichment_lookups=enrichment_lookups,
                 routing_engine=routing_engine,
             )
 
@@ -85,20 +88,30 @@ class RoutingServiceServicer(routing_pb2_grpc.RoutingServiceServicer):
                 return routing_pb2.RouteResponse()
 
             # Format results for gRPC response
+            # result["journeys"] now contains enriched journey dictionaries
             grpc_journeys = []
-            for path, costs in result["journeys"]:
+            for journey_dict in result["journeys"]:
+                # Extract basic info from enriched journey for gRPC
+                summary = journey_dict["summary"]
+                
+                # Extract trip path from legs (only trip legs, not walk/transfer)
+                trip_path = []
+                for leg in journey_dict["legs"]:
+                    if leg["type"] == "trip":
+                        trip_path.append(leg["trip_id"])
+                
                 journey = routing_pb2.Journey(
-                    path=path,
+                    path=trip_path,
                     costs=routing_pb2.JourneyCosts(
-                        money=costs["money"],
-                        transport_time=costs["transport_time"],
-                        walk=costs["walk"],
+                        money=summary["cost"],
+                        transport_time=summary["total_time_minutes"],
+                        walk=summary["walking_distance_meters"],
                     ),
                 )
                 grpc_journeys.append(journey)
 
             return routing_pb2.RouteResponse(
-                num_journeys=len(result["journeys"]),
+                num_journeys=result["num_journeys"],
                 journeys=grpc_journeys,
                 start_trips_found=result["start_trips_found"],
                 end_trips_found=result["end_trips_found"],

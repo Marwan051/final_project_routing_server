@@ -2,6 +2,8 @@ import osmnx as ox
 import pandas as pd
 from collections import defaultdict
 import os
+import ast
+import json
 
 
 def load_network(osm_file_path=None):
@@ -70,24 +72,31 @@ def load_pathways(pathways_file=None):
 
 def merge_trips_to_network(graph, gtfs_data):
     """
-    Merge GTFS trips to the network graph by attaching boarding_map to nodes.
+    Merge GTFS trips to the network graph by attaching enhanced access_map to nodes.
     
     Args:
         graph: NetworkX graph from OSM
         gtfs_data: Dictionary containing GTFS dataframes
         
     Returns:
-        Modified graph with boarding_map attached to nodes
+        Modified graph with access_map attached to nodes
     """
     stops = gtfs_data['stops']
     stop_times = gtfs_data['stop_times']
+    routes = gtfs_data['routes']
+    trips = gtfs_data['trips']
     
-    # 1. Build a mapping: stop_id -> list of trip_ids
+    # 1. Build enhanced mappings with route names and stop sequences
     stop_to_trips = (
         stop_times.groupby('stop_id')['trip_id']
         .apply(list)
         .to_dict()
     )
+    # Create lookup dictionaries for enriched data
+    trip_to_route = trips.set_index('trip_id')['route_id'].to_dict()
+    route_to_agency = routes.set_index('route_id')['agency_id'].to_dict()
+    # Create (trip_id, stop_id) -> stop_sequence mapping
+    trip_stop_to_sequence = stop_times.set_index(['trip_id', 'stop_id'])['stop_sequence'].to_dict()
 
     # 2. Map stops to nearest nodes (Vectorized)
     stop_nodes = ox.distance.nearest_nodes(
@@ -97,22 +106,30 @@ def merge_trips_to_network(graph, gtfs_data):
     )
     stop_to_node_map = pd.Series(stop_nodes, index=stops['stop_id']).to_dict()
 
-    # 3. Attach {trip_id: stop_id} to the OSM nodes
+    # 3. Attach enhanced access information to OSM nodes
     nodes_updated = 0
     for stop_id, node_id in stop_to_node_map.items():
         trips_at_stop = stop_to_trips.get(stop_id)
         
         if trips_at_stop:
-            # Initialize the map if it doesn't exist
-            if 'boarding_map' not in graph.nodes[node_id]:
-                graph.nodes[node_id]['boarding_map'] = {}
+            # Initialize the access map if it doesn't exist
+            if 'access_map' not in graph.nodes[node_id]:
+                graph.nodes[node_id]['access_map'] = {}
                 nodes_updated += 1
-            
-            # Map every trip at this stop to THIS specific stop_id
-            for trip_id in trips_at_stop:
-                graph.nodes[node_id]['boarding_map'][trip_id] = stop_id
 
-    print(f"Finished mapping trips to graph nodes.")
+            # Map each trip with LEAN information (only what's needed for routing)
+            for trip_id in trips_at_stop:
+                route_id = trip_to_route.get(trip_id)
+                agency_id = route_to_agency.get(route_id, "Unknown Agency") if route_id else "Unknown Agency"
+                stop_sequence = trip_stop_to_sequence.get((trip_id, stop_id))
+                
+                graph.nodes[node_id]['access_map'][trip_id] = {
+                    'stop_id': stop_id,
+                    'stop_sequence': stop_sequence,
+                    'agency_id': agency_id  # needed for fare calculation
+                }
+
+    print(f"Finished mapping trips to graph nodes with enhanced access information.")
     print(f"  - {nodes_updated} nodes have trips attached")
     
     return graph
@@ -120,31 +137,90 @@ def merge_trips_to_network(graph, gtfs_data):
 
 def build_trip_graph(pathways):
     """
-    Build a trip graph from pathways dataframe.
+    Build lean trip graph and pathway metadata from pathways dataframe.
     
     Args:
         pathways: DataFrame with pathways
         
     Returns:
-        Tuple of (trip_graph, pathways_dict)
-        - trip_graph: dict of dict where trip_graph[start_trip][end_trip] = pathway_id
-        - pathways_dict: dict indexed by pathway_id
+        Tuple of (trip_graph, pathway_metadata)
+        - trip_graph: dict of dict with lean pathway data for routing
+        - pathway_metadata: dict with enrichment data for results
     """
+    # 1. Build LEAN trip graph - only essential routing data
     trip_graph = defaultdict(dict)
-    pathways_dict = pathways.to_dict('index')
 
     for idx, row in pathways.iterrows():
-        trip_graph[row['start_trip_id']][row['end_trip_id']] = idx
+        # Store ONLY what's needed for routing algorithm
+        lean_pathway = {
+            'start_stop_id': row['start_stop_id'],
+            'end_stop_id': row['end_stop_id'],
+            'start_stop_sequence': row['start_stop_sequence'],
+            'end_stop_sequence': row['end_stop_sequence'],
+            'start_agency_id': row['start_agency_id'],  # needed for fare calculation
+            'walking_distance_m': row['walking_distance_m']
+        }
+        
+        trip_graph[row['start_trip_id']][row['end_trip_id']] = lean_pathway
 
-    print(f"Built trip graph with {len(trip_graph)} unique starting trips")
+    # 2. Build lookup tables for enriching results later
+    pathway_metadata = {}
+    for idx, row in pathways.iterrows():
+        key = (row['start_trip_id'], row['end_trip_id'])
+        pathway_metadata[key] = {
+            'pathway_id': idx,
+            'start_route_id': row['start_route_id'],
+            'end_route_id': row['end_route_id'],
+            'start_route_name': row['start_route_name'],
+            'end_route_name': row['end_route_name'],
+            'start_route_short_name': row['start_route_short_name'],
+            'end_route_short_name': row['end_route_short_name'],
+            'start_trip_headsign': row['start_trip_headsign'],
+            'end_trip_headsign': row['end_trip_headsign'],
+            'start_stop_lat': row['start_stop_lat'],
+            'start_stop_lon': row['start_stop_lon'],
+            'end_stop_lat': row['end_stop_lat'],
+            'end_stop_lon': row['end_stop_lon'],
+            'walking_path_coords': row['walking_path_coords']
+        }
+
+    print(f"Built lean trip graph with {len(trip_graph)} unique starting trips")
     print(f"  - Total edges: {sum(len(v) for v in trip_graph.values())}")
+    print(f"  - Pathway metadata entries: {len(pathway_metadata)}")
     
-    return trip_graph, pathways_dict
+    return trip_graph, pathway_metadata
+
+
+def build_enrichment_lookups(gtfs_data):
+    """
+    Build lookup dictionaries needed for enriching journey results.
+    
+    Args:
+        gtfs_data: Dictionary containing GTFS dataframes
+        
+    Returns:
+        Dictionary of lookup tables
+    """
+    stops = gtfs_data['stops']
+    routes = gtfs_data['routes']
+    trips = gtfs_data['trips']
+    
+    lookups = {
+        'trip_to_route': trips.set_index('trip_id')['route_id'].to_dict(),
+        'route_to_name': routes.set_index('route_id')['route_long_name'].to_dict(),
+        'route_to_short_name': routes.set_index('route_id')['route_short_name'].to_dict(),
+        'trip_to_headsign': trips.set_index('trip_id')['trip_headsign'].to_dict(),
+        'stop_to_coords': stops.set_index('stop_id')[['stop_lat', 'stop_lon']].to_dict('index'),
+        'stop_to_name': stops.set_index('stop_id')['stop_name'].to_dict()  # Additional lookup for stop names
+    }
+    
+    print(f"Built enrichment lookup tables with {len(lookups)} dictionaries")
+    return lookups
 
 
 def create_network(osm_file=None, gtfs_path=None, pathways_file=None):
     """
-    Complete network creation pipeline.
+    Complete network creation pipeline with enhanced pathway logic.
     
     Args:
         osm_file: Path to OSM XML file (defaults to data/labeled.osm)
@@ -152,46 +228,52 @@ def create_network(osm_file=None, gtfs_path=None, pathways_file=None):
         pathways_file: Path to pathways CSV (defaults to data/trip_pathways.csv)
         
     Returns:
-        Tuple of (graph, gtfs_data, trip_graph, pathways_dict)
+        Tuple of (graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups)
     """
     print("=" * 60)
-    print("Starting Network Creation Pipeline")
+    print("Starting Enhanced Network Creation Pipeline")
     print("=" * 60)
     
     # Load network
-    print("\n[1/5] Loading OSM network...")
+    print("\n[1/6] Loading OSM network...")
     graph = load_network(osm_file)
     
     # Load GTFS
-    print("\n[2/5] Loading GTFS data...")
+    print("\n[2/6] Loading GTFS data...")
     gtfs_data = load_gtfs_data(gtfs_path)
     
     # Load pathways
-    print("\n[3/5] Loading pathways...")
+    print("\n[3/6] Loading pathways...")
     pathways = load_pathways(pathways_file)
     
-    # Merge trips to network
-    print("\n[4/5] Merging trips to network...")
+    # Merge trips to network with enhanced access mapping
+    print("\n[4/6] Merging trips to network with enhanced access info...")
     graph = merge_trips_to_network(graph, gtfs_data)
     
-    # Build trip graph
-    print("\n[5/5] Building trip graph...")
-    trip_graph, pathways_dict = build_trip_graph(pathways)
+    # Build lean trip graph and pathway metadata
+    print("\n[5/6] Building lean trip graph and pathway metadata...")
+    trip_graph, pathway_metadata = build_trip_graph(pathways)
+    
+    # Build enrichment lookups
+    print("\n[6/6] Building enrichment lookup tables...")
+    enrichment_lookups = build_enrichment_lookups(gtfs_data)
     
     print("\n" + "=" * 60)
-    print("Network Creation Complete!")
+    print("Enhanced Network Creation Complete!")
     print("=" * 60)
     
-    return graph, gtfs_data, trip_graph, pathways_dict
+    return graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups
 
 
 if __name__ == "__main__":
     # Example usage
-    graph, gtfs_data, trip_graph, pathways_dict = create_network()
+    graph, gtfs_data, trip_graph, pathway_metadata, enrichment_lookups = create_network()
     
     # Print some statistics
-    nodes_with_trips = sum(1 for n, data in graph.nodes(data=True) if 'boarding_map' in data)
+    nodes_with_trips = sum(1 for n, data in graph.nodes(data=True) if 'access_map' in data)
     print(f"\nFinal Statistics:")
     print(f"  - Network nodes: {len(graph.nodes)}")
     print(f"  - Network edges: {len(graph.edges)}")
-    print(f"  - Nodes with trips: {nodes_with_trips}")
+    print(f"  - Nodes with enhanced access maps: {nodes_with_trips}")
+    print(f"  - Pathway metadata entries: {len(pathway_metadata)}")
+    print(f"  - Enrichment lookup tables: {len(enrichment_lookups)}")
