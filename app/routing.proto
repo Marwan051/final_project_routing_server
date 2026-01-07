@@ -28,25 +28,20 @@ message RouteRequest {
   double end_lat = 4;
   int32 max_transfers = 5;
   double walking_cutoff = 6;
+  repeated string restricted_modes = 7;
+  RoutingWeights weights = 8;
+  int32 top_k = 9;
 }
 
-// Cost information for a journey
-message JourneyCosts {
-  double money = 1;
-  double transport_time = 2;
+// Routing weights for journey ranking
+message RoutingWeights {
+  double time = 1;
+  double cost = 2;
   double walk = 3;
+  double transfer = 4;
 }
 
-// A single journey with path and costs
-message Journey {
-  repeated string path = 1;
-  JourneyCosts costs = 2;
-}
-
-// Response containing all found journeys
+// Response containing all found journeys as JSON
 message RouteResponse {
-  int32 num_journeys = 1;
-  repeated Journey journeys = 2;
-  int32 start_trips_found = 3;
-  int32 end_trips_found = 4;
+  string journeys_json = 1;  // Complete enriched journey data as JSON
 }

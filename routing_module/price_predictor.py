@@ -1,48 +1,24 @@
-import numpy as np
+from joblib import load
+import warnings
+import math
 import os
-import json
+
+warnings.filterwarnings("ignore")
 
 
 class TripPricePredictor:
-    def __init__(self, coef=None, intercept=None, params_path=None):
-        if coef is None or intercept is None:
-            if params_path is None:
-                params_path = os.path.join(
-                    os.path.dirname(__file__), "data", "utils", "model_params.json"
-                )
-            with open(params_path, "r") as f:
-                params = json.load(f)
-            coef = params["coef"]
-            intercept = params["intercept"]
+    def __init__(self, model_path=None, params_path=None):
+        if model_path is None:
+            model_path = os.path.join(
+                os.path.dirname(__file__), "data", "utils", "model.pkl"
+            )
+        self.model = load(model_path)
+        self.intercept = self.model.intercept_
+        self.beta_distance, self.beta_passengers = self.model.coef_
 
-        self.coef_ = np.array(coef) if not isinstance(coef, np.ndarray) else coef
-        self.intercept_ = float(intercept)
-
-    def _round_bus_style(self, vals):
-        scalar = np.isscalar(vals)
-        arr = np.array([vals]) if scalar else np.asarray(vals)
-        out = []
-        for v in arr:
-            pounds = int(np.floor(v))
-            dec = v - pounds
-            if dec < 0.125:
-                r = pounds + 0.0
-            elif dec < 0.375:
-                r = pounds + 0.25
-            elif dec < 0.75:
-                r = pounds + 0.5
-            else:
-                r = pounds + 1.0
-            out.append(round(r, 2))
-        return out[0] if scalar else np.array(out)
-
-    def predict(self, distance_km):
-        X = np.array(distance_km)
-        if X.ndim == 1:
-            X = X.reshape(-1, 1)
-
-        X_log = np.log1p(X)
-
-        raw_pred = (X_log * self.coef_).sum(axis=1) + self.intercept_
-
-        return self._round_bus_style(raw_pred)
+    def predict(self, distance, passengers):
+        return math.ceil(
+            self.intercept
+            + self.beta_distance * distance
+            + self.beta_passengers * passengers
+        )

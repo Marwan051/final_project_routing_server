@@ -1,0 +1,2013 @@
+{
+    "num_journeys": 10,
+    "journeys": [
+        {
+            "id": 1,
+            "text_summary": "Total Duration: 31 minutes, Total Cost: $7, Transfers: 0, Total Walking: 1311m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($7, 15 min) - Board at \"Sidi Gaber Station\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 31,
+                "total_distance_meters": 1311,
+                "walking_distance_meters": 1311,
+                "transfers": 0,
+                "cost": 7,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "FUo5FExiKwUTpyTUJYA7R-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 7,
+                    "duration_minutes": 15,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "text_summary": "Total Duration: 32 minutes, Total Cost: $8, Transfers: 0, Total Walking: 1617m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($8, 13 min) - Board at \"Sidi Gaber Station\", Exit at \"Alexandria Stadium\", walk 722m (9 min)",
+            "summary": {
+                "total_time_minutes": 32,
+                "total_distance_meters": 1617,
+                "walking_distance_meters": 1617,
+                "transfers": 0,
+                "cost": 8,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 13,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 722,
+                    "duration_minutes": 9,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.1933843,
+                            29.9081313
+                        ],
+                        [
+                            31.1935053,
+                            29.908404
+                        ],
+                        [
+                            31.1936502,
+                            29.9087165
+                        ],
+                        [
+                            31.1938537,
+                            29.9091678
+                        ],
+                        [
+                            31.194393,
+                            29.9103655
+                        ],
+                        [
+                            31.1946937,
+                            29.9110579
+                        ],
+                        [
+                            31.1948406,
+                            29.911401
+                        ],
+                        [
+                            31.1952395,
+                            29.9122623
+                        ],
+                        [
+                            31.1953537,
+                            29.9125628
+                        ],
+                        [
+                            31.1955682,
+                            29.9132351
+                        ],
+                        [
+                            31.1960164,
+                            29.9128497
+                        ],
+                        [
+                            31.196281,
+                            29.9129041
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "text_summary": "Total Duration: 30 minutes, Total Cost: $13, Transfers: 1, Total Walking: 1311m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($8, 13 min) - Board at \"Sidi Gaber Station\", Exit at \"Alexandria Stadium\", walk 0m (1 min) - Transfer from Street 45 - Train Station (El-Shohada Square) to Hadra - Train Station (El-Shohada Square), take Microbus  to Train Station (El-Shohada Square) ($5, 2 min) - Board at \"Alexandria Stadium\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 30,
+                "total_distance_meters": 1311,
+                "walking_distance_meters": 1311,
+                "transfers": 1,
+                "cost": 13,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 13,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "transfer",
+                    "from_trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "to_trip_id": "GK-B6ExLThapIsC2LwCU5-07:00:00",
+                    "from_trip_name": "Street 45 - Train Station (El-Shohada Square)",
+                    "to_trip_name": "Hadra - Train Station (El-Shohada Square)",
+                    "walking_distance_meters": 0,
+                    "duration_minutes": 1,
+                    "path": [
+                        [
+                            31.196281,
+                            29.9129041
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "GK-B6ExLThapIsC2LwCU5-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 5,
+                    "duration_minutes": 2,
+                    "from": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "text_summary": "Total Duration: 30 minutes, Total Cost: $14, Transfers: 1, Total Walking: 1311m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($8, 13 min) - Board at \"Sidi Gaber Station\", Exit at \"Alexandria Stadium\", walk 0m (1 min) - Transfer from Street 45 - Train Station (El-Shohada Square) to El-Mawqaf El-Geded - Train Station (El-Shohada Square), take Microbus  to Train Station (El-Shohada Square) ($6, 2 min) - Board at \"Alexandria Stadium\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 30,
+                "total_distance_meters": 1311,
+                "walking_distance_meters": 1311,
+                "transfers": 1,
+                "cost": 14,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 13,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "transfer",
+                    "from_trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "to_trip_id": "x4ViZBh3xZ7dXQ23JVcoJ-07:00:00",
+                    "from_trip_name": "Street 45 - Train Station (El-Shohada Square)",
+                    "to_trip_name": "El-Mawqaf El-Geded - Train Station (El-Shohada Square)",
+                    "walking_distance_meters": 0,
+                    "duration_minutes": 1,
+                    "path": [
+                        [
+                            31.196281,
+                            29.9129041
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "x4ViZBh3xZ7dXQ23JVcoJ-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 6,
+                    "duration_minutes": 2,
+                    "from": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "text_summary": "Total Duration: 30 minutes, Total Cost: $14, Transfers: 1, Total Walking: 1311m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($8, 13 min) - Board at \"Sidi Gaber Station\", Exit at \"Alexandria Stadium\", walk 0m (1 min) - Transfer from Street 45 - Train Station (El-Shohada Square) to Airport - Train Station (El-Shohada Square), take Microbus  to Train Station (El-Shohada Square) ($6, 2 min) - Board at \"Alexandria Stadium\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 30,
+                "total_distance_meters": 1311,
+                "walking_distance_meters": 1311,
+                "transfers": 1,
+                "cost": 14,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 13,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "transfer",
+                    "from_trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "to_trip_id": "kKR0i-pEBtj87zRv8vRz5-07:00:00",
+                    "from_trip_name": "Street 45 - Train Station (El-Shohada Square)",
+                    "to_trip_name": "Airport - Train Station (El-Shohada Square)",
+                    "walking_distance_meters": 0,
+                    "duration_minutes": 1,
+                    "path": [
+                        [
+                            31.196281,
+                            29.9129041
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "kKR0i-pEBtj87zRv8vRz5-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 6,
+                    "duration_minutes": 2,
+                    "from": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "text_summary": "Total Duration: 30 minutes, Total Cost: $16, Transfers: 1, Total Walking: 1311m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($8, 13 min) - Board at \"Sidi Gaber Station\", Exit at \"Alexandria Stadium\", walk 0m (1 min) - Transfer from Street 45 - Train Station (El-Shohada Square) to Abis 8 - Train Station (El-Shohada Square), take Microbus  to Train Station (El-Shohada Square) ($8, 2 min) - Board at \"Alexandria Stadium\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 30,
+                "total_distance_meters": 1311,
+                "walking_distance_meters": 1311,
+                "transfers": 1,
+                "cost": 16,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 13,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "transfer",
+                    "from_trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "to_trip_id": "eZVkbWyfsnRxGOMkDoSfl-07:00:00",
+                    "from_trip_name": "Street 45 - Train Station (El-Shohada Square)",
+                    "to_trip_name": "Abis 8 - Train Station (El-Shohada Square)",
+                    "walking_distance_meters": 0,
+                    "duration_minutes": 1,
+                    "path": [
+                        [
+                            31.196281,
+                            29.9129041
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "eZVkbWyfsnRxGOMkDoSfl-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 2,
+                    "from": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "text_summary": "Total Duration: 30 minutes, Total Cost: $17, Transfers: 1, Total Walking: 1311m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($8, 13 min) - Board at \"Sidi Gaber Station\", Exit at \"Alexandria Stadium\", walk 0m (1 min) - Transfer from Street 45 - Train Station (El-Shohada Square) to El-Awayed - Train Station (El-Shohada Square), take Microbus  to Train Station (El-Shohada Square) ($9, 2 min) - Board at \"Alexandria Stadium\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 30,
+                "total_distance_meters": 1311,
+                "walking_distance_meters": 1311,
+                "transfers": 1,
+                "cost": 17,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 13,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "transfer",
+                    "from_trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "to_trip_id": "9iBvMMprqaal91Eesle9O-07:00:00",
+                    "from_trip_name": "Street 45 - Train Station (El-Shohada Square)",
+                    "to_trip_name": "El-Awayed - Train Station (El-Shohada Square)",
+                    "walking_distance_meters": 0,
+                    "duration_minutes": 1,
+                    "path": [
+                        [
+                            31.196281,
+                            29.9129041
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "9iBvMMprqaal91Eesle9O-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 9,
+                    "duration_minutes": 2,
+                    "from": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "text_summary": "Total Duration: 30 minutes, Total Cost: $17, Transfers: 1, Total Walking: 1311m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($8, 13 min) - Board at \"Sidi Gaber Station\", Exit at \"Alexandria Stadium\", walk 0m (1 min) - Transfer from Street 45 - Train Station (El-Shohada Square) to El-Sa'ah (Clock Square) - Train Station (El-Shohada Square), take Microbus  to Train Station (El-Shohada Square) ($9, 2 min) - Board at \"Alexandria Stadium\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 30,
+                "total_distance_meters": 1311,
+                "walking_distance_meters": 1311,
+                "transfers": 1,
+                "cost": 17,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 13,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "transfer",
+                    "from_trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "to_trip_id": "WWP7DCP2cjGJxPZSN68Y2-07:00:00",
+                    "from_trip_name": "Street 45 - Train Station (El-Shohada Square)",
+                    "to_trip_name": "El-Sa'ah (Clock Square) - Train Station (El-Shohada Square)",
+                    "walking_distance_meters": 0,
+                    "duration_minutes": 1,
+                    "path": [
+                        [
+                            31.196281,
+                            29.9129041
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "WWP7DCP2cjGJxPZSN68Y2-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 9,
+                    "duration_minutes": 2,
+                    "from": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "text_summary": "Total Duration: 30 minutes, Total Cost: $18, Transfers: 1, Total Walking: 1311m, walk 896m (11 min), take Microbus  to Train Station (El-Shohada Square) ($8, 13 min) - Board at \"Sidi Gaber Station\", Exit at \"Alexandria Stadium\", walk 0m (1 min) - Transfer from Street 45 - Train Station (El-Shohada Square) to Al-Seyouf (Falaky) - Train Station (El-Shohada Square), take Microbus  to Train Station (El-Shohada Square) ($10, 2 min) - Board at \"Alexandria Stadium\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 30,
+                "total_distance_meters": 1311,
+                "walking_distance_meters": 1311,
+                "transfers": 1,
+                "cost": 18,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 896,
+                    "duration_minutes": 11,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2229273,
+                            29.9367251
+                        ],
+                        [
+                            31.2225937,
+                            29.93699
+                        ],
+                        [
+                            31.2220168,
+                            29.9374481
+                        ],
+                        [
+                            31.2214357,
+                            29.9379095
+                        ],
+                        [
+                            31.2212833,
+                            29.9380306
+                        ],
+                        [
+                            31.2214704,
+                            29.93834
+                        ],
+                        [
+                            31.2216922,
+                            29.9387067
+                        ],
+                        [
+                            31.2219387,
+                            29.9391145
+                        ],
+                        [
+                            31.2210072,
+                            29.9398305
+                        ],
+                        [
+                            31.2209629,
+                            29.9398129
+                        ],
+                        [
+                            31.2206763,
+                            29.9401657
+                        ],
+                        [
+                            31.2204428,
+                            29.9404455
+                        ],
+                        [
+                            31.2207669,
+                            29.9407281
+                        ],
+                        [
+                            31.2206025,
+                            29.9410641
+                        ],
+                        [
+                            31.2203746,
+                            29.9415609
+                        ],
+                        [
+                            31.2204141,
+                            29.9421491
+                        ],
+                        [
+                            31.2201813,
+                            29.9421704
+                        ],
+                        [
+                            31.2198592,
+                            29.9422393
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 8,
+                    "duration_minutes": 13,
+                    "from": {
+                        "stop_id": 324,
+                        "name": "Sidi Gaber Station",
+                        "coord": [
+                            31.219855,
+                            29.942223
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "transfer",
+                    "from_trip_id": "oL-cc2-4cc5VXM7r-ShUc-07:00:00",
+                    "to_trip_id": "K1fkkoXPyuSsmQKdjzWHd-07:00:00",
+                    "from_trip_name": "Street 45 - Train Station (El-Shohada Square)",
+                    "to_trip_name": "Al-Seyouf (Falaky) - Train Station (El-Shohada Square)",
+                    "walking_distance_meters": 0,
+                    "duration_minutes": 1,
+                    "path": [
+                        [
+                            31.196281,
+                            29.9129041
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "K1fkkoXPyuSsmQKdjzWHd-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 10,
+                    "duration_minutes": 2,
+                    "from": {
+                        "stop_id": 402,
+                        "name": "Alexandria Stadium",
+                        "coord": [
+                            31.196256983935434,
+                            29.91283044098625
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "text_summary": "Total Duration: 59 minutes, Total Cost: $14, Transfers: 1, Total Walking: 682m, walk 267m (4 min), take Microbus  to El-Sa'ah (Clock Square) ($7, 17 min) - Board at \"Cleopatra Pedestrian Bridge\", Exit at \"Victoria College\", walk 0m (1 min) - Transfer from El-Mansheya - El-Sa'ah (Clock Square) to Asafra - Train Station (El-Shohada Square), take Microbus  to Train Station (El-Shohada Square) ($7, 35 min) - Board at \"Victoria College\", Exit at \"Train Station (Al Shohadaa)\", walk 416m (5 min)",
+            "summary": {
+                "total_time_minutes": 59,
+                "total_distance_meters": 682,
+                "walking_distance_meters": 682,
+                "transfers": 1,
+                "cost": 14,
+                "modes": [
+                    "microbus"
+                ]
+            },
+            "legs": [
+                {
+                    "type": "walk",
+                    "distance_meters": 267,
+                    "duration_minutes": 4,
+                    "path": [
+                        [
+                            31.2233829,
+                            29.9371675
+                        ],
+                        [
+                            31.2230645,
+                            29.9366162
+                        ],
+                        [
+                            31.2231886,
+                            29.9365176
+                        ],
+                        [
+                            31.2234651,
+                            29.936298
+                        ],
+                        [
+                            31.2245771,
+                            29.935415
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "RbB2w0p-_BgwRa6AbSa-b-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "El-Sa'ah (Clock Square)",
+                    "fare": 7,
+                    "duration_minutes": 17,
+                    "from": {
+                        "stop_id": 246,
+                        "name": "Cleopatra Pedestrian Bridge",
+                        "coord": [
+                            31.224462548518883,
+                            29.935270907749118
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 264,
+                        "name": "Victoria College",
+                        "coord": [
+                            31.247545376916825,
+                            29.97826935420236
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "transfer",
+                    "from_trip_id": "RbB2w0p-_BgwRa6AbSa-b-07:00:00",
+                    "to_trip_id": "FUo5FExiKwUTpyTUJYA7R-07:00:00",
+                    "from_trip_name": "El-Mansheya - El-Sa'ah (Clock Square)",
+                    "to_trip_name": "Asafra - Train Station (El-Shohada Square)",
+                    "walking_distance_meters": 0,
+                    "duration_minutes": 1,
+                    "path": [
+                        [
+                            31.2477259,
+                            29.9785481
+                        ]
+                    ]
+                },
+                {
+                    "type": "trip",
+                    "trip_id": "FUo5FExiKwUTpyTUJYA7R-07:00:00",
+                    "mode": "microbus",
+                    "route_short_name": "Microbus ",
+                    "headsign": "Train Station (El-Shohada Square)",
+                    "fare": 7,
+                    "duration_minutes": 35,
+                    "from": {
+                        "stop_id": 263,
+                        "name": "Victoria College",
+                        "coord": [
+                            31.247678247244345,
+                            29.97830430085358
+                        ]
+                    },
+                    "to": {
+                        "stop_id": 359,
+                        "name": "Train Station (Al Shohadaa)",
+                        "coord": [
+                            31.193334,
+                            29.904704
+                        ]
+                    },
+                    "path": []
+                },
+                {
+                    "type": "walk",
+                    "distance_meters": 416,
+                    "duration_minutes": 5,
+                    "path": [
+                        [
+                            31.1930201,
+                            29.9073283
+                        ],
+                        [
+                            31.192734,
+                            29.9067312
+                        ],
+                        [
+                            31.1924821,
+                            29.9061691
+                        ],
+                        [
+                            31.1921318,
+                            29.9053308
+                        ],
+                        [
+                            31.1921638,
+                            29.9050427
+                        ],
+                        [
+                            31.1923982,
+                            29.9051808
+                        ],
+                        [
+                            31.1932045,
+                            29.9047485
+                        ],
+                        [
+                            31.1932695,
+                            29.9045303
+                        ],
+                        [
+                            31.1933338,
+                            29.904704
+                        ]
+                    ]
+                }
+            ]
+        }
+    ],
+    "start_trips_found": 39,
+    "end_trips_found": 40,
+    "total_routes_found": 60,
+    "error": null
+}
