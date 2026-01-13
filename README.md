@@ -37,8 +37,14 @@ pip install -r requirements.txt
 
 ```bash
 cd app
-python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. routing.proto
+python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. --pyi_out=. routing.proto
 ```
+
+This generates:
+
+- `routing_pb2.py` - Protocol buffer message classes
+- `routing_pb2_grpc.py` - gRPC service classes
+- `routing_pb2.pyi` - Type stub files for IDE autocomplete support
 
 ### 2. Run the gRPC Server
 
@@ -153,7 +159,6 @@ Response:
 1. **Import Proto File**: In Postman, create a new gRPC request and import `app/routing.proto`
 2. **Server URL**: `localhost:50051`
 3. **Select Method**:
-
    - `routing.RoutingService/HealthCheck` for health check
    - `routing.RoutingService/FindRoute` for finding routes
 

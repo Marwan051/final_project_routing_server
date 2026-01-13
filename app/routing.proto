@@ -5,10 +5,10 @@ package routing;
 // The routing service definition
 service RoutingService {
   // Health check
-  rpc HealthCheck (HealthRequest) returns (HealthResponse) {}
-  
+  rpc HealthCheck(HealthRequest) returns (HealthResponse) {}
+
   // Find routes between two locations
-  rpc FindRoute (RouteRequest) returns (RouteResponse) {}
+  rpc FindRoute(RouteRequest) returns (RouteResponse) {}
 }
 
 // Health check request (empty)

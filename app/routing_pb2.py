@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rrouting.proto\x12\x07routing\"\x0f\n\rHealthRequest\"1\n\x0eHealthResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x85\x01\n\x0cRouteRequest\x12\x11\n\tstart_lon\x18\x01 \x01(\x01\x12\x11\n\tstart_lat\x18\x02 \x01(\x01\x12\x0f\n\x07\x65nd_lon\x18\x03 \x01(\x01\x12\x0f\n\x07\x65nd_lat\x18\x04 \x01(\x01\x12\x15\n\rmax_transfers\x18\x05 \x01(\x05\x12\x16\n\x0ewalking_cutoff\x18\x06 \x01(\x01\"C\n\x0cJourneyCosts\x12\r\n\x05money\x18\x01 \x01(\x01\x12\x16\n\x0etransport_time\x18\x02 \x01(\x01\x12\x0c\n\x04walk\x18\x03 \x01(\x01\"=\n\x07Journey\x12\x0c\n\x04path\x18\x01 \x03(\t\x12$\n\x05\x63osts\x18\x02 \x01(\x0b\x32\x15.routing.JourneyCosts\"}\n\rRouteResponse\x12\x14\n\x0cnum_journeys\x18\x01 \x01(\x05\x12\"\n\x08journeys\x18\x02 \x03(\x0b\x32\x10.routing.Journey\x12\x19\n\x11start_trips_found\x18\x03 \x01(\x05\x12\x17\n\x0f\x65nd_trips_found\x18\x04 \x01(\x05\x32\x90\x01\n\x0eRoutingService\x12@\n\x0bHealthCheck\x12\x16.routing.HealthRequest\x1a\x17.routing.HealthResponse\"\x00\x12<\n\tFindRoute\x12\x15.routing.RouteRequest\x1a\x16.routing.RouteResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rrouting.proto\x12\x07routing\"\x0f\n\rHealthRequest\"1\n\x0eHealthResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x85\x01\n\x0cRouteRequest\x12\x11\n\tstart_lon\x18\x01 \x01(\x01\x12\x11\n\tstart_lat\x18\x02 \x01(\x01\x12\x0f\n\x07\x65nd_lon\x18\x03 \x01(\x01\x12\x0f\n\x07\x65nd_lat\x18\x04 \x01(\x01\x12\x15\n\rmax_transfers\x18\x05 \x01(\x05\x12\x16\n\x0ewalking_cutoff\x18\x06 \x01(\x01\"8\n\x08StopInfo\x12\x0f\n\x07stop_id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\r\n\x05\x63oord\x18\x03 \x03(\x01\"X\n\x07WalkLeg\x12\x0c\n\x04type\x18\x01 \x01(\t\x12\x17\n\x0f\x64istance_meters\x18\x02 \x01(\x05\x12\x18\n\x10\x64uration_minutes\x18\x03 \x01(\x05\x12\x0c\n\x04path\x18\x04 \x03(\t\"\xec\x01\n\x07TripLeg\x12\x0c\n\x04type\x18\x01 \x01(\t\x12\x0f\n\x07trip_id\x18\x02 \x01(\t\x12\x0c\n\x04mode\x18\x03 \x01(\t\x12\x12\n\nroute_name\x18\x04 \x01(\t\x12\x18\n\x10route_short_name\x18\x05 \x01(\t\x12\x10\n\x08headsign\x18\x06 \x01(\t\x12\x0c\n\x04\x66\x61re\x18\x07 \x01(\x01\x12\x18\n\x10\x64uration_minutes\x18\x08 \x01(\x05\x12\x1f\n\x04\x66rom\x18\t \x01(\x0b\x32\x11.routing.StopInfo\x12\x1d\n\x02to\x18\n \x01(\x0b\x32\x11.routing.StopInfo\x12\x0c\n\x04path\x18\x0b \x03(\t\"\xbc\x01\n\x0bTransferLeg\x12\x0c\n\x04type\x18\x01 \x01(\t\x12\x14\n\x0c\x66rom_trip_id\x18\x02 \x01(\t\x12\x12\n\nto_trip_id\x18\x03 \x01(\t\x12\x16\n\x0e\x66rom_trip_name\x18\x04 \x01(\t\x12\x14\n\x0cto_trip_name\x18\x05 \x01(\t\x12\x1f\n\x17walking_distance_meters\x18\x06 \x01(\x05\x12\x18\n\x10\x64uration_minutes\x18\x07 \x01(\x05\x12\x0c\n\x04path\x18\x08 \x03(\t\"\x7f\n\x03Leg\x12 \n\x04walk\x18\x01 \x01(\x0b\x32\x10.routing.WalkLegH\x00\x12 \n\x04trip\x18\x02 \x01(\x0b\x32\x10.routing.TripLegH\x00\x12(\n\x08transfer\x18\x03 \x01(\x0b\x32\x14.routing.TransferLegH\x00\x42\n\n\x08leg_type\"\x9c\x01\n\x0eJourneySummary\x12\x1a\n\x12total_time_minutes\x18\x01 \x01(\x05\x12\x1d\n\x15total_distance_meters\x18\x02 \x01(\x05\x12\x1f\n\x17walking_distance_meters\x18\x03 \x01(\x05\x12\x11\n\ttransfers\x18\x04 \x01(\x05\x12\x0c\n\x04\x63ost\x18\x05 \x01(\x01\x12\r\n\x05modes\x18\x06 \x03(\t\"q\n\x07Journey\x12\n\n\x02id\x18\x01 \x01(\t\x12\x14\n\x0ctext_summary\x18\x02 \x01(\t\x12(\n\x07summary\x18\x03 \x01(\x0b\x32\x17.routing.JourneySummary\x12\x1a\n\x04legs\x18\x04 \x03(\x0b\x32\x0c.routing.Leg\"}\n\rRouteResponse\x12\x14\n\x0cnum_journeys\x18\x01 \x01(\x05\x12\"\n\x08journeys\x18\x02 \x03(\x0b\x32\x10.routing.Journey\x12\x19\n\x11start_trips_found\x18\x03 \x01(\x05\x12\x17\n\x0f\x65nd_trips_found\x18\x04 \x01(\x05\x32\x90\x01\n\x0eRoutingService\x12@\n\x0bHealthCheck\x12\x16.routing.HealthRequest\x1a\x17.routing.HealthResponse\"\x00\x12<\n\tFindRoute\x12\x15.routing.RouteRequest\x1a\x16.routing.RouteResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -37,12 +37,22 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_HEALTHRESPONSE']._serialized_end=92
   _globals['_ROUTEREQUEST']._serialized_start=95
   _globals['_ROUTEREQUEST']._serialized_end=228
-  _globals['_JOURNEYCOSTS']._serialized_start=230
-  _globals['_JOURNEYCOSTS']._serialized_end=297
-  _globals['_JOURNEY']._serialized_start=299
-  _globals['_JOURNEY']._serialized_end=360
-  _globals['_ROUTERESPONSE']._serialized_start=362
-  _globals['_ROUTERESPONSE']._serialized_end=487
-  _globals['_ROUTINGSERVICE']._serialized_start=490
-  _globals['_ROUTINGSERVICE']._serialized_end=634
+  _globals['_STOPINFO']._serialized_start=230
+  _globals['_STOPINFO']._serialized_end=286
+  _globals['_WALKLEG']._serialized_start=288
+  _globals['_WALKLEG']._serialized_end=376
+  _globals['_TRIPLEG']._serialized_start=379
+  _globals['_TRIPLEG']._serialized_end=615
+  _globals['_TRANSFERLEG']._serialized_start=618
+  _globals['_TRANSFERLEG']._serialized_end=806
+  _globals['_LEG']._serialized_start=808
+  _globals['_LEG']._serialized_end=935
+  _globals['_JOURNEYSUMMARY']._serialized_start=938
+  _globals['_JOURNEYSUMMARY']._serialized_end=1094
+  _globals['_JOURNEY']._serialized_start=1096
+  _globals['_JOURNEY']._serialized_end=1209
+  _globals['_ROUTERESPONSE']._serialized_start=1211
+  _globals['_ROUTERESPONSE']._serialized_end=1336
+  _globals['_ROUTINGSERVICE']._serialized_start=1339
+  _globals['_ROUTINGSERVICE']._serialized_end=1483
 # @@protoc_insertion_point(module_scope)
