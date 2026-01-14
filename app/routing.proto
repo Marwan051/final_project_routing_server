@@ -41,7 +41,83 @@ message RoutingWeights {
   double transfer = 4;
 }
 
-// Response containing all found journeys as JSON
+// Response containing all found journeys
 message RouteResponse {
-  string journeys_json = 1;  // Complete enriched journey data as JSON
+  int32 num_journeys = 1;
+  repeated Journey journeys = 2;
+  int32 start_trips_found = 3;
+  int32 end_trips_found = 4;
+  int32 total_routes_found = 5;
+  string error = 6;
+}
+
+// A single journey option
+message Journey {
+  int32 id = 1;
+  string text_summary = 2;
+  JourneySummary summary = 3;
+  repeated Leg legs = 4;
+}
+
+// Summary of journey metrics
+message JourneySummary {
+  int32 total_time_minutes = 1;
+  int32 total_distance_meters = 2;
+  int32 walking_distance_meters = 3;
+  int32 transfers = 4;
+  double cost = 5;
+  repeated string modes = 6;
+}
+
+// A leg of the journey (walk, trip, or transfer)
+message Leg {
+  oneof leg_type {
+    WalkLeg walk = 1;
+    TripLeg trip = 2;
+    TransferLeg transfer = 3;
+  }
+}
+
+// Walking leg
+message WalkLeg {
+  int32 distance_meters = 1;
+  int32 duration_minutes = 2;
+  repeated Coordinate path = 3;
+}
+
+// Transit trip leg
+message TripLeg {
+  string trip_id = 1;
+  string mode = 2;
+  string route_short_name = 3;
+  string headsign = 4;
+  double fare = 5;
+  int32 duration_minutes = 6;
+  Stop from = 7;
+  Stop to = 8;
+  repeated Coordinate path = 9;
+}
+
+// Transfer between trips
+message TransferLeg {
+  string from_trip_id = 1;
+  string to_trip_id = 2;
+  string from_trip_name = 3;
+  string to_trip_name = 4;
+  int32 walking_distance_meters = 5;
+  int32 duration_minutes = 6;
+  repeated Coordinate path = 7;
+}
+
+// Stop information
+message Stop {
+  int32 stop_id = 1;
+  string name = 2;
+  Coordinate coord = 3;
+}
+
+// Coordinate (lon, lat)
+message Coordinate {
+  double lon = 1;
+  double lat = 2;
 }
