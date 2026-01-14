@@ -5,6 +5,8 @@ import ast
 import re
 from collections import deque
 
+from routing_module.database import PostgresConnector
+
 
 class RoutingEngine:
     def __init__(self, network_data):
@@ -116,7 +118,13 @@ class RoutingEngine:
 
     def get_distance(self, trip_id, start_stop, end_stop):
         """Get distance for a trip (uses precomputed data)"""
-        return self.distance_data.get(trip_id, 0) / 1000
+        db = PostgresConnector()
+        return (
+            db.get_distance_between_two_stops_within_route(
+                trip_id, start_stop, end_stop
+            )
+            / 1000
+        )
 
     def get_fare(self, trip_id, start_stop, end_stop, agency="P_O_14"):
         """Calculate fare using precomputed model"""
