@@ -28,6 +28,7 @@ class RoutingEngine:
         self.cost_model = network_data["cost_model"]
         self.traffic_data = network_data["traffic_data"]
         self.distance_data = network_data["distance_data"]
+        self.db = PostgresConnector()
 
         print(f"RoutingEngine initialized with:")
         print(f"  - OSM graph: {len(self.graph.nodes)} nodes")
@@ -118,9 +119,9 @@ class RoutingEngine:
 
     def get_distance(self, trip_id, start_stop, end_stop):
         """Get distance for a trip (uses precomputed data)"""
-        db = PostgresConnector()
+
         return (
-            db.get_distance_between_two_stops_within_route(
+            self.db.get_distance_between_two_stops_within_route(
                 trip_id, start_stop, end_stop
             )
             / 1000
