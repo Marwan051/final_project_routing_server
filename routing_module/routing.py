@@ -606,7 +606,7 @@ class RoutingEngine:
 
             # Create text summary
             summary_parts = [
-                f"Total Duration: {total_duration_minutes} minutes, Total Cost: ${round(total_fare, 2)}, Transfers: {transfers}, Total Walking: {int(total_walk)}m"
+                f"Total Duration: {total_duration_minutes} minutes, Total Cost: E£{round(total_fare, 2)}, Transfers: {transfers}, Total Walking: {int(total_walk)}m"
             ]
 
             for leg in legs:
@@ -616,7 +616,7 @@ class RoutingEngine:
                     )
                 elif leg["type"] == "trip":
                     summary_parts.append(
-                        f"take {leg['route_short_name']} to {leg['headsign']} (${leg['fare']}, {leg['duration_minutes']} min) - Board at \"{leg['from']['name']}\", Exit at \"{leg['to']['name']}\""
+                        f"take {leg['route_short_name']} to {leg['headsign']} (E£{leg['fare']}, {leg['duration_minutes']} min) - Board at \"{leg['from']['name']}\", Exit at \"{leg['to']['name']}\""
                     )
                 elif leg["type"] == "transfer":
                     summary_parts.append(
