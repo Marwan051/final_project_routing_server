@@ -603,7 +603,7 @@ class RoutingEngine:
 
             # Create text summary
             summary_parts = [
-                f"Total Duration: {total_duration_minutes} minutes, Total Cost: ${round(total_fare, 2)}, Transfers: {transfers}, Total Walking: {int(total_walk)}m"
+                f"Total Duration: {total_duration_minutes} minutes, Total Cost: E£{round(total_fare, 2)}, Transfers: {transfers}, Total Walking: {int(total_walk)}m"
             ]
 
             for leg in legs:
