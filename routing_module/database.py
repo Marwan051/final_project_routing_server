@@ -134,13 +134,9 @@ class PostgresConnector:
         try:
             cur = self._connection.cursor()
             params = (trip_id, start_lon, start_lat, end_lon, end_lat)
-            logger.info(
-                f"Executing get_distance_between_two_coordinates_within_route with params: trip_id={trip_id}, start_lat={start_lat}, start_lon={start_lon}, end_lat={end_lat}, end_lon={end_lon}"
-            )
             cur.execute(template_query, params)
             row = cur.fetchone()
             if row and row[0] is not None:
-                logger.info(f"Successfully calculated distance: {row[0]} meters")
                 return float(row[0])
             else:
                 logger.warning(
@@ -221,13 +217,9 @@ class PostgresConnector:
         try:
             cur = self._connection.cursor()
             params = (trip_id, start_stop, end_stop)
-            logger.info(
-                f"Executing get_distance_between_two_stops_within_route with params: trip_id={trip_id}, start_stop={start_stop}, end_stop={end_stop}"
-            )
             cur.execute(stops_query, params)
             row = cur.fetchone()
             if row and row[0] is not None:
-                logger.info(f"Successfully calculated distance: {row[0]} meters")
                 return float(row[0])
             else:
                 logger.warning(

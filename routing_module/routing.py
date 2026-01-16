@@ -4,6 +4,9 @@ import math
 import ast
 import re
 from collections import deque
+import time
+import json
+import os
 
 from routing_module.database import PostgresConnector
 
@@ -731,6 +734,79 @@ class RoutingEngine:
         )
 
         return final_results
+
+
+def test_routing_time(
+    routing_obj: RoutingEngine,
+    start_lat,
+    start_lon,
+    end_lat,
+    end_lon,
+    output_filename,
+    max_transfers=2,
+    walking_cutoff=2000,
+    weights=None,
+    restricted_modes=None,
+    top_k=5,
+):
+    """
+    Test routing time and export results to JSON file.
+
+    Args:
+        routing_obj: RoutingEngine instance
+        start_lat, start_lon: Starting coordinates
+        end_lat, end_lon: Destination coordinates
+        output_filename: Name of the JSON file to export results
+        max_transfers: Maximum number of transfers allowed (default: 2)
+        walking_cutoff: Maximum walking distance in meters (default: 1000)
+        weights: Dictionary with keys 'time', 'cost', 'walk', 'transfer' (default: None)
+        restricted_modes: List of agency IDs to avoid (default: None)
+        top_k: Number of top journeys to return (default: 5)
+
+    Returns:
+        Time taken in seconds
+    """
+    start_time = time.time()
+    result = routing_obj.find_journeys(
+        start_lat,
+        start_lon,
+        end_lat,
+        end_lon,
+        max_transfers=max_transfers,
+        walking_cutoff=walking_cutoff,
+        weights=weights,
+        restricted_modes=restricted_modes,
+        top_k=top_k,
+    )
+    time_taken = time.time() - start_time
+
+    # Add time_taken to the result dictionary
+    result["time_taken"] = time_taken
+
+    # Export to JSON file
+    try:
+        # Use /app directory for Docker or current directory otherwise
+        output_dir = "/app" if os.path.exists("/app") else "."
+        output_path = os.path.join(output_dir, output_filename)
+
+        # Ensure directory exists
+        os.makedirs(
+            (
+                os.path.dirname(output_path)
+                if os.path.dirname(output_path)
+                else output_dir
+            ),
+            exist_ok=True,
+        )
+
+        with open(output_path, "w") as f:
+            json.dump(result, f, indent=2)
+
+        print(f"Results exported to: {output_path}")
+    except Exception as e:
+        print(f"Warning: Could not write output file: {e}")
+
+    return time_taken
 
 
 # Global instance management

@@ -7,7 +7,7 @@ import json
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from routing_module.routing import get_routing_engine
+from routing_module.routing import get_routing_engine, test_routing_time
 from routing_module.network import create_network
 import routing_pb2
 import routing_pb2_grpc
@@ -208,6 +208,31 @@ def serve():
 
     initialize_network()
 
+    print(
+        f"1st Routing engine test took {test_routing_time(routing_engine,31.309193138899534,30.064049053504206,31.10597456179077,29.764874244269574,'hannoville_to_academy.json')} seconds"
+    )
+    print(
+        f"2nd Routing engine test took {test_routing_time(routing_engine,31.20761,29.94323,31.22053,29.94309,'college_to_sidi_gaber.json')} seconds"
+    )
+
+    print(
+        f"3rd Routing engine test took {test_routing_time(routing_engine,31.2235494,29.9373941,31.193363,29.9067595,'sidi_gaber_sheikh_to_misr_station.json')} seconds"
+    )
+
+    time_4 = test_routing_time(
+        routing_engine,
+        31.2235494,
+        29.9373941,
+        31.193363,
+        29.9067595,
+        "sidi_gaber_sheikh_to_misr_station_weights.json",
+        max_transfers=2,
+        walking_cutoff=2000,
+        restricted_modes=["Bus", "Minibus"],
+        weights={"time": 0.6, "cost": 0.2, "walk": 0.0, "transfer": 0.2},
+        top_k=10,
+    )
+    print(f"4th Routing engine test took {time_4} seconds")
     # Create gRPC server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     routing_pb2_grpc.add_RoutingServiceServicer_to_server(
