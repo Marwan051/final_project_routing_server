@@ -613,7 +613,7 @@ class RoutingEngine:
                     )
                 elif leg["type"] == "trip":
                     summary_parts.append(
-                        f"take {leg['route_short_name']} to {leg['headsign']} (${leg['fare']}, {leg['duration_minutes']} min) - Board at \"{leg['from']['name']}\", Exit at \"{leg['to']['name']}\""
+                        f"take {leg['route_short_name']} to {leg['headsign']} (E£{leg['fare']}, {leg['duration_minutes']} min) - Board at \"{leg['from']['name']}\", Exit at \"{leg['to']['name']}\""
                     )
                 elif leg["type"] == "transfer":
                     summary_parts.append(
